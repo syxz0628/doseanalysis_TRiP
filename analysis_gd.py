@@ -18,6 +18,7 @@ from datetime import datetime
 
 import related_funs
 
+
 class class_analysis_gd:
     def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,fractions,path2gdlist,savename):
         self.patientID=patientID
