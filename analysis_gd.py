@@ -34,7 +34,7 @@ class class_analysis_gd:
         self.Vxx=[90,95,100,105]
         self.Dxx=[5,95]
         self.Dcc=[1]
-        self.path2log='/u/ysheng/MyAIXd/projects/patients/commands/Doseana.log'
+        self.path2log='./dose_compare_logs/00Doseana_processing.log'
 
         self.voilist = []
         self.VOI_names=[]
