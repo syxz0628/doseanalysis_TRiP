@@ -207,11 +207,15 @@ class class_analysis_gd:
             #CI = self.getCIByVOI(filename,voiname)
 
             V95 = self.fun_Vxx(95, xvalues, yvalues)
-            CI = V95/self.VOI_volumes
-            if CI: 
-                CN=float(V95*V95/(CI*100.))
+            if float(self.VOI_volumes) != 0:
+                CI = V95/float(self.VOI_volumes)
+                CN = float(V95 * V95 / (CI * 100.))
             else:
-                print("Calculation of CN not possible. CI=0 cases!")
+                print("Calculation of CI/CN not possible. CI=0 cases!")
+                CI='NA'
+
+
+
          
         for temp in voiVxx:
             try:
