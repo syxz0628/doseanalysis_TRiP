@@ -207,12 +207,15 @@ class class_analysis_gd:
             #CI = self.getCIByVOI(filename,voiname)
 
             V95 = self.fun_Vxx(95, xvalues, yvalues)
-            if float(self.VOI_volumes) != 0:
-                CI = V95/float(self.VOI_volumes)
+            if dIrrVolcc != 0:
+                CI = V95/float(dIrrVolcc)
                 CN = float(V95 * V95 / (CI * 100.))
             else:
                 print("Calculation of CI/CN not possible. CI=0 cases!")
-                CI='NA'
+                CI = 'NA'
+                writeinfo = "Voi " + voiname + " CI = NA"
+                related_funs.writelog(self.path2log, writeinfo)
+
 
         for temp in voiVxx:
             try:
