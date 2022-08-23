@@ -39,6 +39,7 @@ class class_analysis_gd:
         self.Dxx=[5,95]
         self.Dcc=[1]
         self.path2log='./dose_compare_logs/00_Doseana_processing.log'
+        #self.path2log = '/home/yurii/Sheng/patient_data/00_Doseana_processing.log'
 
         self.voilist = []
         self.VOI_names=[]
@@ -123,10 +124,10 @@ class class_analysis_gd:
                     self.VOI_Parameter.append('D'+str(n)+'cc')
             # for external
             elif voitype=='EXT':
-                self.VOI_names.append(voiname)
-                # print('voidose',voidose)
-                self.VOI_pres_Dose.append(self.lowerdoseforext)
-                self.VOI_volumes.append(str(dIrrVolcc))
+                for i in range (0, len(voiVxx)): # vxx dxx dcc min max mean hi ci
+                    self.VOI_names.append(voiname)
+                    self.VOI_pres_Dose.append(self.lowerdoseforext)
+                    self.VOI_volumes.append(str(dIrrVolcc))
                 for j in voiVxx:
                     self.VOI_Parameter.append('V'+str(j)+'%')
             else:
@@ -279,7 +280,8 @@ class class_analysis_gd:
         if (voitype != "EXT"):
             print('wrong input, this is for External structure only')
         else:
-            ExtV95 = self.fun_Vxx(95, xvalues, yvalues)*dIrrVolcc # abs v95%
+            percen=self.fun_Vxx(95, xvalues, yvalues)
+            ExtV95 = percen/100*dIrrVolcc # abs v95%
         return ExtV95
 
     def getDVHValuesFromFileByVOI(self, filename, VOIstr,**kwargs):
