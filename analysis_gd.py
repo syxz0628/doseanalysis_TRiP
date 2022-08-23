@@ -34,7 +34,7 @@ class class_analysis_gd:
         self.Vxx=[90,95,100,105]
         self.Dxx=[5,95]
         self.Dcc=[1]
-        self.path2log='./dose_compare_logs/00Doseana_processing.log'
+        self.path2log='./dose_compare_logs/00_Doseana_processing.log'
 
         self.voilist = []
         self.VOI_names=[]
@@ -58,7 +58,7 @@ class class_analysis_gd:
         # save in specific patient folder
         # savedata_fildname='/u/ysheng/MyAIXd/projects/patients/'+self.patientID+'/dose_ana_'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
         # save in command/dose-compare_logs folder
-        savedata_fildname='./dose_compare_logs/'+self.patientID+'_'+self.planname + self.savename+'.txt'
+        savedata_fildname='./dose_compare_logs/'+self.patientID+'_'+self.planname+'_' + self.savename+'.txt'
         # write log
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
