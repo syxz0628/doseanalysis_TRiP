@@ -98,8 +98,8 @@ class class_analysis_gd:
                 for i in range (0, len(voiVxx)+len(voiDxx)+len(voiDcc)+3+2): # vxx dxx dcc min max mean hi ci
                     self.VOI_names.append(voiname)
                     self.VOI_pres_Dose.append(voidose)
-                    if self.lowerdoseforext>voidose:
-                        self.lowerdoseforext=voidose
+                    if self.lowerdoseforext>float(voidose):
+                        self.lowerdoseforext=float(voidose)
                     self.VOI_volumes.append(str(dIrrVolcc))
                 self.VOI_Parameter.append('min')
                 self.VOI_Parameter.append('max')
