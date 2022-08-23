@@ -214,9 +214,6 @@ class class_analysis_gd:
                 print("Calculation of CI/CN not possible. CI=0 cases!")
                 CI='NA'
 
-
-
-         
         for temp in voiVxx:
             try:
                 Vxxlist.append(self.fun_Vxx(temp,xvalues,yvalues))
