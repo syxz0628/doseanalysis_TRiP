@@ -20,15 +20,19 @@ import related_funs
 
 
 class class_analysis_gd:
-    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,fractions,path2gdlist,savename):
+    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,path2gdlist,savename):
         self.patientID=patientID
         self.planname=planname
         self.targetnamelist=targetnamelist
         self.targetdoselist=targetdoselist
         self.oarnamelist=oarnamelist
+        self.externalname=externalname
+        self.lowerdoseforext=999 #take lower prescribed dose for calculate of V95 for Ext
+        self.ExtV95=0
         self.fractions=fractions
         self.FileList=path2gdlist
         self.savename=savename
+
         if self.savename==None:
             self.savename=''
         self.Vxx=[90,95,100,105]
@@ -53,7 +57,8 @@ class class_analysis_gd:
             self.SetVOI(voiname=self.targetnamelist[targetinfo],voidose=self.targetdoselist[targetinfo],\
                         voitype='Target',Vxx=self.Vxx,Dxx=self.Dxx,Dcc=self.Dcc)
         for oarinfo in self.oarnamelist:
-            self.SetVOI(voiname=oarinfo,voitype='OAR',voidose=float(self.PlanDose)*float(self.fractions),Dcc=self.Dcc)
+            self.SetVOI(voiname=oarinfo,voitype='OAR',voidose=float(self.PlanDose) * float(self.fractions),Dcc=self.Dcc)
+        self.SetVOI(voiname=self.externalname, voitype='EXT', voidose=float(self.PlanDose) * float(self.fractions), Vxx=self.Vxx)
         # path of save data .txt
         # save in specific patient folder
         # savedata_fildname='/u/ysheng/MyAIXd/projects/patients/'+self.patientID+'/dose_ana_'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
@@ -93,6 +98,8 @@ class class_analysis_gd:
                 for i in range (0, len(voiVxx)+len(voiDxx)+len(voiDcc)+3+2): # vxx dxx dcc min max mean hi ci
                     self.VOI_names.append(voiname)
                     self.VOI_pres_Dose.append(voidose)
+                    if self.lowerdoseforext>voidose:
+                        self.lowerdoseforext=voidose
                     self.VOI_volumes.append(str(dIrrVolcc))
                 self.VOI_Parameter.append('min')
                 self.VOI_Parameter.append('max')
@@ -108,15 +115,24 @@ class class_analysis_gd:
             elif voitype=='OAR':
                 for i in range (0, len(voiDcc)+1): # dcc mean
                     self.VOI_names.append(voiname)
-                    print('voidose',voidose)
+                    #print('voidose',voidose)
                     self.VOI_pres_Dose.append('/'+str(self.fractions)+'Fxs/')
                     self.VOI_volumes.append(str(dIrrVolcc))
                 self.VOI_Parameter.append('mean')
                 for n in voiDcc:
-                    self.VOI_Parameter.append('D'+str(n)+'cc')    
+                    self.VOI_Parameter.append('D'+str(n)+'cc')
+            # for external
+            elif voitype=='EXT':
+                self.VOI_names.append(voiname)
+                # print('voidose',voidose)
+                self.VOI_pres_Dose.append(self.lowerdoseforext)
+                self.VOI_volumes.append(str(dIrrVolcc))
+                for j in voiVxx:
+                    self.VOI_Parameter.append('V'+str(j)+'%')
             else:
                 wirteloginfo='a wrong type found, check voitype'
-                related_funs.writelog(self.path2log, wirteloginfo)    
+                related_funs.writelog(self.path2log, wirteloginfo)
+
             
         self.writelinesinfo.append(self.VOI_names)
         self.writelinesinfo.append(self.VOI_volumes)
@@ -127,6 +143,10 @@ class class_analysis_gd:
         for filename in self.FileList: 
             self.VOI_data.append([]) 
             print("File: "+filename)
+            # get External V95 info for CI calculation for target.
+            for voiname, voitype, voidose, voiVxx, voiDxx, voiDcc in self.voilist:
+                if voitype=='EXT':
+                    self.ExtV95=self.getExternalV95(filename, voiname, voitype, self.lowerdoseforext)
             for voiname,voitype,voidose,voiVxx,voiDxx,voiDcc in self.voilist:
                 Dmin,Dmax,Dmean,CI,HI,Vxxlist,Dxxlist,Dcclist=self.getDVHMetricsFromFileByVOI(filename,voiname,voitype,voidose,voiVxx,voiDxx,voiDcc)
                 if voitype=='Target':
@@ -145,6 +165,9 @@ class class_analysis_gd:
                     self.VOI_data[-1].append(str('%.2f' % Dmean))
                     for Dccinfo in Dcclist:
                         self.VOI_data[-1].append(str('%.2f' % Dccinfo))
+                elif voitype=='EXT':
+                    for Vxxinfo in Vxxlist:
+                        self.VOI_data[-1].append(str('%.2f' % Vxxinfo + '%'))
         for voidata in self.VOI_data:
             self.writelinesinfo.append(voidata)
         reverseinfo=list(zip(*self.writelinesinfo))
@@ -208,8 +231,8 @@ class class_analysis_gd:
 
             V95 = self.fun_Vxx(95, xvalues, yvalues)
             if dIrrVolcc != 0:
-                CI = V95/float(dIrrVolcc)
-                CN = float(V95 * V95 / (CI * 100.))
+                CI = self.ExtV95/float(dIrrVolcc)
+                #CN = float(V95 * V95 / (CI * 100.))
             else:
                 print("Calculation of CI/CN not possible. CI=0 cases!")
                 CI = 'NA'
@@ -233,8 +256,31 @@ class class_analysis_gd:
             Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues)*float(voidose)/100.00)
             #except:
             #    Dcclist.append(-1)
-        print(Dcclist)
+        #print(Dcclist)
         return Dmin,Dmax,Dmean,CI,HI,Vxxlist,Dxxlist,Dcclist
+
+    def getExternalV95(self, filename, voiname, voitype, voidose):
+        # print voiname
+        print("External: " + voiname)
+
+        if voidose != self.PlanDose:
+            dTarget_Fraction_Dose = float(voidose) / float(self.fractions)
+            coefficient = float(self.PlanDose) / dTarget_Fraction_Dose
+        else:
+            coefficient = 1
+        xvalues = []
+        yvalues = []
+        dIrrVolcc = self.getIrrVolByVOI(filename, voiname) / 1000  # mm^3 --> cc
+        if dIrrVolcc > 0.0:
+            xvalues, yvalues = self.getDVHValuesFromFileByVOI(filename, voiname)
+        xvalues = np.array(xvalues)
+        yvalues = np.array(yvalues)
+        xvalues = xvalues * coefficient
+        if (voitype != "EXT"):
+            print('wrong input, this is for External structure only')
+        else:
+            ExtV95 = self.fun_Vxx(95, xvalues, yvalues)*dIrrVolcc # abs v95%
+        return ExtV95
 
     def getDVHValuesFromFileByVOI(self, filename, VOIstr,**kwargs):
         bReadDifferential = kwargs.get("bReadDifferential",False)
