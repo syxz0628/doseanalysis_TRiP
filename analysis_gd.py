@@ -76,7 +76,7 @@ class class_analysis_gd:
             for oneline in writedata:
                 savefileinfo.writelines(self.patientID+' '+self.planname+' ')
                 for onedata in oneline:
-                    savefileinfo.writelines(onedata+' ')
+                    savefileinfo.writelines(str(onedata)+' ')
                 savefileinfo.write('\n')
             
     def SetVOI(self,voiname, voitype, **kwargs):
