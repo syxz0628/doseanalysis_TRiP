@@ -55,7 +55,10 @@ class class_analysis_gd:
         for oarinfo in self.oarnamelist:
             self.SetVOI(voiname=oarinfo,voitype='OAR',voidose=float(self.PlanDose)*float(self.fractions),Dcc=self.Dcc)
         # path of save data .txt
-        savedata_fildname='/u/ysheng/MyAIXd/projects/patients/'+self.patientID+'/dose_ana_'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
+        # save in specific patient folder
+        # savedata_fildname='/u/ysheng/MyAIXd/projects/patients/'+self.patientID+'/dose_ana_'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
+        # save in command/dose-compare_logs folder
+        savedata_fildname='./dose_compare_logs/'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
         # write log
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
