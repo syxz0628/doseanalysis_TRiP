@@ -201,9 +201,10 @@ class class_analysis_gd:
             D5=self.fun_Dxx(5, xvalues, yvalues)
             D95=self.fun_Dxx(95, xvalues, yvalues)
             HI = D5 - D95
-            CI = self.getCIByVOI(filename,voiname)
-            V95 = self.fun_Vxx(95, xvalues, yvalues)
+            #CI = self.getCIByVOI(filename,voiname)
 
+            V95 = self.fun_Vxx(95, xvalues, yvalues)
+            CI = V95/self.VOI_volumes
             if CI: 
                 CN=float(V95*V95/(CI*100.))
             else:
