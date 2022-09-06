@@ -542,5 +542,5 @@ class class_analysis_gd:
     def fun_ana_gamma(self,path2dose1,path2dose2,gammacri):
         print('detects show gamma')
         gammaana = gamma.class_gammaanalysis()
-        criterialist,gammalist=gammaana.fun_gamma_analysis(additionalinfo='', dose1=path2dose1, dose2=path2dose2, dosediscrit=gammacri, cuoff='0.1',maxdose='global', interfra='5', maxgamma='1.1', fraction='1', saveresultas='False',pronecase=False,moreinfo=False)
+        criterialist,gammalist=gammaana.fun_gamma_analysis(additionalinfo='', dose1=path2dose1, dose2=path2dose2, dosediscrit=gammacri, cuoff=10,maxdose='global', interfra=5, maxgamma=1.1, fraction=1, saveresultas='False',pronecase=False,moreinfo=False)
         return gammalist
