@@ -85,7 +85,7 @@ class class_analysis_gd:
                     gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
             print(gammaresult)
             for i in range(0,len(gammacri)):
-                for j in range(0,len(gammaresult)/len(gammacri)):
+                for j in range(0,int(len(gammaresult)/len(gammacri))):
                     writegammadata += self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i+2*j]
                 writegammadata+='\n'
             print(writegammadata)
