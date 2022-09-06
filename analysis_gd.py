@@ -88,7 +88,6 @@ class class_analysis_gd:
                 for j in range(0,int(len(gammaresult)/len(gammacri))):
                     writegammadata+=str(gammaresult[i+2*j][0])+'% '
                 writegammadata+='\n'
-            print(writegammadata)
                 #
         # save info and analysis data
         with open (savedata_fildname,'w+') as savefileinfo:
@@ -98,6 +97,7 @@ class class_analysis_gd:
                 for onedata in oneline:
                     savefileinfo.writelines(str(onedata)+' ')
                 savefileinfo.write('\n')
+            savefileinfo.writelines(writegammadata)
             
     def SetVOI(self,voiname, voitype, **kwargs):
         voiVxx = kwargs.get('Vxx', self.Vxx)
