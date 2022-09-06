@@ -86,7 +86,7 @@ class class_analysis_gd:
             print(gammaresult)
             for i in range(0,len(gammacri)):
                 for j in range(0,int(len(gammaresult)/len(gammacri))):
-                    writegammadata += self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i+2*j]
+                    writegammadata += self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i+2*j][0]
                 writegammadata+='\n'
             print(writegammadata)
                 #
