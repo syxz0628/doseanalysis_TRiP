@@ -76,6 +76,7 @@ class class_analysis_gd:
         writegammadata=''
         gammacri=['3/3','2/2']
         if gamma:
+            print('detects show gamma')
             path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalbio.nrrd'
             howmany4Ds=0
             for path2gd in self.FileList[1:]:
@@ -83,8 +84,11 @@ class class_analysis_gd:
                 for cri in gammacri:
                     gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
             print(gammaresult)
-                # for i in range(0, len(gammacri)):
-                #     writegammadata+=self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i]
+            for i in range(0,len(gammacri)):
+                for j in range(0,len(gammaresult)/len(gammacri)):
+                    writegammadata += self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i+2*j]
+                writegammadata+='\n'
+            print(writegammadata)
                 #
         # save info and analysis data
         with open (savedata_fildname,'w+') as savefileinfo:
@@ -540,7 +544,6 @@ class class_analysis_gd:
         return newY
 
     def fun_ana_gamma(self,path2dose1,path2dose2,gammacri):
-        print('detects show gamma')
         gammaana = gamma.class_gammaanalysis()
         criterialist,gammalist=gammaana.fun_gamma_analysis(additionalinfo='', dose1=path2dose1, dose2=path2dose2, dosediscrit=gammacri, cuoff=10,maxdose='global', interfra=5, maxgamma=1.1, fraction=1, saveresultas='False',pronecase=False,moreinfo=False)
         return gammalist
