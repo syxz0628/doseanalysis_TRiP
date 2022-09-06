@@ -81,8 +81,8 @@ class class_analysis_gd:
             for path2gd in self.FileList[1:]:
                 path24Dnrrd = path2gd[:path2gd.rfind('/')] + 'totalbio.nrrd'
                 for cri in gammacri:
-                    gammaresult[-1].append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
-                print(gammaresult)
+                    gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+            print(gammaresult)
                 # for i in range(0, len(gammacri)):
                 #     writegammadata+=self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i]
                 #
