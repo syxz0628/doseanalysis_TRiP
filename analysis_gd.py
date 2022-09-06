@@ -6,18 +6,18 @@ Created on Wed Jul  6 13:58:34 2022
 @author: ysheng
 """
 import re
-import sys,glob ## command line stuff
+# import sys,glob ## command line stuff
 import numpy as np
-import pylab
-import os
-import matplotlib 
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import rc,rcParams
-from matplotlib.patches import Rectangle
-from datetime import datetime
+# import pylab
+# import os
+# import matplotlib
+# import matplotlib.pyplot as plt
+# from matplotlib.pyplot import rc,rcParams
+# from matplotlib.patches import Rectangle
+# from datetime import datetime
 
 import related_funs
-
+import gamma
 
 class class_analysis_gd:
     def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,path2gdlist,savename):
@@ -36,7 +36,7 @@ class class_analysis_gd:
         if self.savename==None:
             self.savename=''
         self.Vxx=[90,95,100,105]
-        self.Dxx=[5,95]
+        self.Dxx=[5,95,98]
         self.Dcc=[1]
         self.path2log='./dose_compare_logs/00_Doseana_processing.log'
         #self.path2log = '/home/yurii/Sheng/patient_data/00_Doseana_processing.log'
@@ -50,8 +50,8 @@ class class_analysis_gd:
         self.writelinesinfo=[]
         
         
-    def fun_analysis_gd(self,dose_shown_in_gd):#dose_shown_in_gd is the dose written in the exec file, for SPHIC momi cases this value was set to 3 for all plans.
-        self.PlanDose = dose_shown_in_gd    
+    def fun_analysis_gd(self,dose_shown_in_gd,gamma):#dose_shown_in_gd is the dose written in the exec file, for SPHIC momi cases this value was set to 3 for all plans.
+        self.PlanDose = dose_shown_in_gd
         related_funs.writelog(self.path2log, 'Start a new analysis')
         # add target and voi all info to voilist
         for targetinfo in range(0,len( self.targetnamelist)):
@@ -68,22 +68,37 @@ class class_analysis_gd:
         # write log
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
-        # write analysis data
-        writedata=self.AnalyzeDVHs()
-        
+        # write analysis data to line
+        writegddata=self.AnalyzeDVHs()
+        # write gamma data to line
+        gammacri = []
+        gammaresult = []
+        writegammadata=''
+        gammacri=['3/3','2/2']
+        if gamma:
+            path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + 'totalbio.nrrd'
+            howmany4Ds=0
+            for path2gd in self.FileList[1:]:
+                path24Dnrrd = path2gd[:path2gd.rfind('/')] + 'totalbio.nrrd'
+                for cri in gammacri:
+                    gammaresult[-1].append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+                print(gammaresult)
+                # for i in range(0, len(gammacri)):
+                #     writegammadata+=self.patientID+' '+self.planname+' - - - gamma'+gammacri[i]+' - '+gammaresult[i]
+                #
         # save info and analysis data
         with open (savedata_fildname,'w+') as savefileinfo:
             #savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
-            for oneline in writedata:
+            for oneline in writegddata:
                 savefileinfo.writelines(self.patientID+' '+self.planname+' ')
                 for onedata in oneline:
                     savefileinfo.writelines(str(onedata)+' ')
                 savefileinfo.write('\n')
             
     def SetVOI(self,voiname, voitype, **kwargs):
-        voiVxx = kwargs.get('Vxx', [90,95,100,105])
-        voiDxx = kwargs.get('Dxx', [5,95])
-        voiDcc = kwargs.get('Dcc', [1])
+        voiVxx = kwargs.get('Vxx', self.Vxx)
+        voiDxx = kwargs.get('Dxx', self.Dxx)
+        voiDcc = kwargs.get('Dcc', self.Dcc)
         voidose = kwargs.get('voidose', self.PlanDose)
         self.voilist.append([voiname,voitype,voidose,voiVxx,voiDxx,voiDcc])
         
@@ -222,7 +237,7 @@ class class_analysis_gd:
         
         DVal = 0
         if(voitype=="Target"):
-    	    #finding D95 & D5
+            #finding D95 & D5
             #D5  = self.D_n(5.0,[yvalues],xvalues)[0] 
             #D95 = self.D_n(95,[yvalues],xvalues)[0]
             D5=self.fun_Dxx(5, xvalues, yvalues)
@@ -277,6 +292,7 @@ class class_analysis_gd:
         xvalues = np.array(xvalues)
         yvalues = np.array(yvalues)
         xvalues = xvalues * coefficient
+        ExtV95=0
         if (voitype != "EXT"):
             print('wrong input, this is for External structure only')
         else:
@@ -307,9 +323,6 @@ class class_analysis_gd:
             if startline==0:
                 print("VOI %s not found!" % VOIstr)
                 exit(1)
-	###debug
-	#print startline,stopline
-	
         with open(filename,'r') as fin:
             xvalues=[]
             yvalues=[]
@@ -525,3 +538,9 @@ class class_analysis_gd:
     def fun_trend(self,newX,X1,X2,Y1,Y2):
         newY=Y1+(Y2-Y1)*(newX-X1)/(X2-X1)
         return newY
+
+    def fun_ana_gamma(self,path2dose1,path2dose2,gammacri):
+        print('detects show gamma')
+        gammaana = gamma.class_gammaanalysis()
+        criterialist,gammalist=gammaana.fun_gamma_analysis(additionalinfo='', dose1=path2dose1, dose2=path2dose2, dosediscrit=gammacri, cuoff='0.1',maxdose='global', interfra='5', maxgamma='1.1', fraction='1', saveresultas='False',pronecase=False,moreinfo=False)
+        return gammalist
