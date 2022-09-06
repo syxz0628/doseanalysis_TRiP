@@ -79,7 +79,7 @@ class class_analysis_gd:
             path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalbio.nrrd'
             howmany4Ds=0
             for path2gd in self.FileList[1:]:
-                path24Dnrrd = path2gd[:path2gd.rfind('/')] + 'totalbio.nrrd'
+                path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
                 for cri in gammacri:
                     gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
             print(gammaresult)
