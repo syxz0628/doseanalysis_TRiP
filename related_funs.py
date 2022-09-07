@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 def max_index(lst_int):
     index = []
     max_n = max(lst_int)
@@ -12,6 +13,7 @@ def writelog(path2log,writeinfo):
     if path2log != None:
         print(path2log,' --> ',writeinfo)
         with open(path2log, 'a+') as logfile:
+            logfile.writelines(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+os.linesep)
             logfile.writelines(writeinfo+os.linesep)
             
 def fun_trend(newX,X1,X2,Y1,Y2):
