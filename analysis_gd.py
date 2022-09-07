@@ -77,11 +77,13 @@ class class_analysis_gd:
         gammacri=['3/3','2/2']
         if gamma:
             print('detects show gamma')
-            path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalbio.nrrd'
-            howmany4Ds=0
+            if 'phy' in self.FileList[0][self.FileList[0].rfind('/'):]:
+                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalphys.nrrd'
+            else:
+                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalbio.nrrd'
             for path2gd in self.FileList[1:]:
                 if 'phy' in path2gd[path2gd.rfind('/'):]:
-                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
+                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalphys.nrrd'
                 elif 'bio' in path2gd[path2gd.rfind('/'):]:
                     path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
                 else:
