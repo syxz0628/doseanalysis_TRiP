@@ -85,7 +85,7 @@ class class_gammaanalysis():
         axes_array_np = tuple(axes_array)
         return axes_array_np, data
 
-    def fun_gamma_analysis(self,additionalinfo,dose1, dose2, dosediscrit, cuoff, maxdose, interfra, maxgamma, fraction, saveresultas,pronecase,moreinfo):
+    def fun_gamma_analysis(self,additionalinfo,dose1, dose2, dosediscrit, cuoff, maxdose, interfra, maxgamma, fraction, saveresults,pronecase,moreinfo):
         if dose1[dose1.rfind('.'):] == '.dcm' and dose2[dose2.rfind('.'):] == '.dcm':
             reference = pydicom.dcmread(dose1)
             evaluation = pydicom.dcmread(dose2)
@@ -156,9 +156,9 @@ class class_gammaanalysis():
             gammalist.append(round(gammavalue,2))
         # write files
         No_firstline = True
-        if saveresultas!=False:
+        if saveresults!='False':
             try:
-                with open(saveresultas, 'r') as file_read:
+                with open(saveresults, 'r') as file_read:
                     if 'ref' in file_read.readlines()[0]:
                         No_firstline = False
             except:
