@@ -82,9 +82,13 @@ class class_analysis_gd:
             for path2gd in self.FileList[1:]:
                 path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
                 for cri in gammacri:
-                    gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+                    try:
+                        gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+                    except:
+                        path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalphys.nrrd'
+                        gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd, cri))
             for i in range(0,len(gammacri)):
-                writegammadata += self.patientID + ' ' + self.planname + ' - - - gamma' + gammacri[i] + ' - '
+                writegammadata += self.patientID + ' ' + self.planname + ' - - - 0gamma' + gammacri[i] + ' - '
                 for j in range(0,int(len(gammaresult)/len(gammacri))):
                     writegammadata+=str(gammaresult[i+2*j][0])+'% '
                 writegammadata+='\n'
