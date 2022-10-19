@@ -20,7 +20,7 @@ import related_funs
 import gamma
 
 class class_analysis_gd:
-    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,path2gdlist,savename):
+    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,path2gdlist,savename,savepath):
         self.patientID=patientID
         self.planname=planname
         self.targetnamelist=targetnamelist
@@ -32,13 +32,16 @@ class class_analysis_gd:
         self.fractions=fractions
         self.FileList=path2gdlist
         self.savename=savename
+        self.savepath=savepath
 
         if self.savename==None:
             self.savename=''
+        if self.savepath == None:
+            self.savepath='./'
         self.Vxx=[90,95,100,105]
         self.Dxx=[5,95,98]
         self.Dcc=[1]
-        self.path2log='./dose_compare_logs/00_Doseana_processing.log'
+        self.path2log=self.savepath+'00_Doseana_processing.log'
         #self.path2log = '/home/yurii/Sheng/patient_data/00_Doseana_processing.log'
 
         self.voilist = []
@@ -64,7 +67,7 @@ class class_analysis_gd:
         # save in specific patient folder
         # savedata_fildname='/u/ysheng/MyAIXd/projects/patients/'+self.patientID+'/dose_ana_'+self.savename+'_'+self.patientID+'_'+self.planname+'.txt'
         # save in command/dose-compare_logs folder
-        savedata_fildname='./dose_compare_logs/'+self.patientID+'_'+self.planname+'_' + self.savename+'.txt'
+        savedata_fildname=self.savepath+self.patientID+'_'+self.planname+'_' + self.savename+'.txt'
         # write log
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
@@ -78,14 +81,14 @@ class class_analysis_gd:
         if gamma:
             print('detects show gamma')
             if 'phy' in self.FileList[0][self.FileList[0].rfind('/'):]:
-                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalphys.nrrd'
+                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalnom_phys.nrrd'
             else:
-                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalbio.nrrd'
+                path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalnom_bio.nrrd'
             for path2gd in self.FileList[1:]:
                 if 'phy' in path2gd[path2gd.rfind('/'):]:
-                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalphys.nrrd'
+                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalnom_phys.nrrd'
                 elif 'bio' in path2gd[path2gd.rfind('/'):]:
-                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
+                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalnom_bio.nrrd'
                 else:
                     writeloginfo='check if reference/compare dose nrrd file exist for patient '+self.patientID+' plan '+self.planname
                     related_funs.writelog(self.path2log,writeloginfo)
