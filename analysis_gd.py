@@ -172,7 +172,9 @@ class class_analysis_gd:
         self.writelinesinfo.append(self.VOI_Parameter)
         
         # get the voi corresponding data
-        for filename in self.FileList: 
+        for filename in self.FileList:
+            if 'NO_CT' in filename:
+                break
             self.VOI_data.append([]) 
             print("File: "+filename)
             # get External V95 info for CI calculation for target.
