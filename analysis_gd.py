@@ -8,13 +8,6 @@ Created on Wed Jul  6 13:58:34 2022
 import re
 # import sys,glob ## command line stuff
 import numpy as np
-# import pylab
-# import os
-# import matplotlib
-# import matplotlib.pyplot as plt
-# from matplotlib.pyplot import rc,rcParams
-# from matplotlib.patches import Rectangle
-# from datetime import datetime
 
 import related_funs
 import gamma
@@ -72,7 +65,12 @@ class class_analysis_gd:
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
         # write analysis data to line
-        writegddata=self.AnalyzeDVHs()
+        try:
+            writegddata=self.AnalyzeDVHs()
+        except:
+            writeloginfo = 'error when analysisDVH:' + self.patientID + ' plan: ' + self.planname
+            related_funs.writelog(self.path2log, writeloginfo)
+            writegddata=''
         # write gamma data to line
         gammacri = []
         gammaresult = []
