@@ -85,10 +85,13 @@ class class_analysis_gd:
             else:
                 path23dnrrd = self.FileList[0][:self.FileList[0].rfind('/')] + '/totalnom_bio.nrrd'
             for path2gd in self.FileList[1:]:
+                nominname=''
+                if '3D' in path2gd:
+                    nominname='nom'
                 if 'phy' in path2gd[path2gd.rfind('/'):]:
-                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalphys.nrrd'
+                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/total'+nominname + 'phys.nrrd'
                 elif 'bio' in path2gd[path2gd.rfind('/'):]:
-                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/totalbio.nrrd'
+                    path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/total'+nominname + 'bio.nrrd'
                 else:
                     writeloginfo='check if reference/compare dose nrrd file exist for patient '+self.patientID+' plan '+self.planname
                     related_funs.writelog(self.path2log,writeloginfo)
