@@ -65,12 +65,9 @@ class class_analysis_gd:
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
         # write analysis data to line
-        try:
-            writegddata=self.AnalyzeDVHs()
-        except:
-            writeloginfo = 'error when analysisDVH:' + self.patientID + ' plan: ' + self.planname
-            related_funs.writelog(self.path2log, writeloginfo)
-            writegddata=''
+
+        writegddata=self.AnalyzeDVHs()
+
         # write gamma data to line
         gammacri = []
         gammaresult = []
