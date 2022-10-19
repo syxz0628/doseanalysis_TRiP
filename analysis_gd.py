@@ -87,7 +87,7 @@ class class_analysis_gd:
             for path2gd in self.FileList[1:]:
                 nominname=''
                 if '3D' in path2gd:
-                    nominname='nom'
+                    nominname='nom_'
                 if 'phy' in path2gd[path2gd.rfind('/'):]:
                     path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/total'+nominname + 'phys.nrrd'
                 elif 'bio' in path2gd[path2gd.rfind('/'):]:
