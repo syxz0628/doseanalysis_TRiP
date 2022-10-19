@@ -90,12 +90,13 @@ class class_analysis_gd:
                     path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/total'+nominname + 'phys.nrrd'
                 elif 'bio' in path2gd[path2gd.rfind('/'):]:
                     path24Dnrrd = path2gd[:path2gd.rfind('/')] + '/total'+nominname + 'bio.nrrd'
-                else:
-                    writeloginfo='check if reference/compare dose nrrd file exist for patient '+self.patientID+' plan '+self.planname
-                    related_funs.writelog(self.path2log,writeloginfo)
-                    break
+
                 for cri in gammacri:
-                    gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+                    try:
+                        gammaresult.append(self.fun_ana_gamma(path23dnrrd, path24Dnrrd,cri))
+                    except:
+                        writeloginfo = 'check if reference/compare dose nrrd file exist for patient ' + self.patientID + ' plan ' + self.planname
+                        related_funs.writelog(self.path2log, writeloginfo)
 
             for i in range(0,len(gammacri)):
                 writegammadata += self.patientID + ' ' + self.planname + ' - - - 0gamma' + gammacri[i] + ' - '
