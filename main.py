@@ -18,7 +18,7 @@ if __name__=="__main__":
     parser.add_argument("-e", "--external", required=True, help="External name")
     parser.add_argument("-f","--fractions", required=True, help="fractions for this plan")
     parser.add_argument("-ga", "--gamma", required=False, action='store_true',help="add gamma analysis to the result",default=False)
-    parser.add_argument("-s","--savename", required=False, help="txt file save to name")
+    # parser.add_argument("-s","--savename", required=False, help="txt file save to name")
     parser.add_argument("-sp", "--savepath", required=False, help="file path to save logs")
     parser.add_argument("-r", "--robustevaluation", required=False, help="flag if DVH files are robust evaluation files, 21 or 9, Default None")
     parser.add_argument("-n", "--nameofgdlist", required=True, help="name of the data, such as 3DRecon, 4DPerRSC,4DMBR,,3DReview_CTxx, 4DRePerRSC_CTxx")
@@ -38,7 +38,6 @@ if __name__=="__main__":
     targetdoselist=args.targetdoselist.split(',')
     oarnamelist=args.oarnamelist.split(',')
     fractions=args.fractions
-    save2name=args.savename
     savepath=args.savepath
     gammaEva=args.gamma
     externalname=args.external
@@ -47,5 +46,5 @@ if __name__=="__main__":
     nameofgdlist = args.nameofgdlist.split(',')
 
 # call analysis_gd function
-    analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,save2name,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist)
+    analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist)
     analysis_gd_data.fun_analysis_gd(dose_shown_in_gd=3)

@@ -13,7 +13,7 @@ import related_funs
 import gamma
 
 class class_analysis_gd:
-    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,savename,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist):
+    def __init__(self, patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist):
         self.patientID=patientID
         self.planname=planname
         self.targetnamelist=targetnamelist
@@ -23,7 +23,6 @@ class class_analysis_gd:
         self.lowerdoseforext=999 #take lower prescribed dose for calculate of V95 for Ext
         self.ExtV95=0
         self.fractions=fractions
-        self.savename=savename
         self.savepath=savepath
         self.gammaEva=gammaEva
         self.robustevaluation=robustevaluation
@@ -39,8 +38,6 @@ class class_analysis_gd:
         self.FileList=path2gdlist
         self.nameofgdlist=nameofgdlist
 
-        if self.savename==None:
-            self.savename=''
         if self.savepath == None:
             self.savepath='./'
         self.Vxx=[90,95,100,105]
@@ -67,7 +64,8 @@ class class_analysis_gd:
             related_funs.writelog(self.path2log, errormess)
             sys.exit()
         related_funs.writelog(self.path2log, 'Start a new analysis')
-        savedata_fildname=self.savepath+self.patientID+'_'+self.planname+'_' + self.savename+'.txt'
+        savedata_fildname=self.savepath+self.patientID+'_'+self.planname+'_' + \
+            "_".join(m for m in self.nameofgdlist) + '.txt'
         # write log
         writeloginfo='running patient: '+self.patientID+' plan: '+self.planname
         related_funs.writelog(self.path2log, writeloginfo)
@@ -464,9 +462,6 @@ class class_analysis_gd:
 
     def getDVHMetricsFromFileByVOI(self,filename,voiname,voitype,voidose,voiVxx,voiDxx,voiDcc):
         
-        #print voiname
-        print("VOI: "+voiname)
-        
         if voidose!=self.PlanDose:
             dTarget_Fraction_Dose=float(voidose)/float(self.fractions)
             coefficient=float(self.PlanDose)/dTarget_Fraction_Dose
@@ -540,7 +535,6 @@ class class_analysis_gd:
                 Dxxlist.append(-1)
         for temp in voiDcc:
             Dval=float(temp)/float(dIrrVolcc)*100.00
-            print("Dval=",Dval)
             #try:
             Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues)*float(voidose)/100.00)
             #except:
@@ -550,8 +544,6 @@ class class_analysis_gd:
 
     def getExternalV95(self, filename, voiname, voitype, voidose):
         # print voiname
-        print("External: " + voiname)
-
         if voidose != self.PlanDose:
             dTarget_Fraction_Dose = float(voidose) / float(self.fractions)
             coefficient = float(self.PlanDose) / dTarget_Fraction_Dose
