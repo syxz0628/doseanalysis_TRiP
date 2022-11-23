@@ -125,8 +125,8 @@ class class_analysis_gd:
             # save info and analysis data
             with open (savedata_fildname,'w+') as savefileinfo:
                 #savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
-                #reverseinfo = list(zip(*self.writelinesinfo))
-                reverseinfo = self.writelinesinfo
+                reverseinfo = list(zip(*self.writelinesinfo))
+                #reverseinfo = self.writelinesinfo
                 for oneline in reverseinfo:
                     for onedata in oneline:
                         savefileinfo.writelines(str(onedata)+' ')
@@ -277,13 +277,28 @@ class class_analysis_gd:
                     for Dccinfo in Dcclist:
                         self.referenceDATAforCompare.append(Dccinfo)
             referenceDATA = False
-        voidata_np=np.array(VOI_data)
 
-
+        for i in range(1,len(VOI_data[0])):
+            floatvoidata=[]
+            for j in range(1,len(VOI_data)): # reference data start average from voidata 1. skip the reference.
+                floatvoidata.append(float(VOI_data[j][i]))
+            voidata_np = np.array(floatvoidata)
+            voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+            voidata_mean.append(np.mean(voidata_np))
+            voidata_median.append(np.median(voidata_np))
+            voidata_SD.append(np.std(voidata_np))
+        VOI_data.append(voidata_worst)
+        VOI_data.append(voidata_mean)
+        VOI_data.append(voidata_median)
+        VOI_data.append(voidata_SD)
         return patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data
     def AnalyzeDVH_Non_Reference(self,fileToanalysis,Definednameofdata): # return write data: vol, pdose, parameter.
         # start get dose DVH info.
         VOI_data = []
+        voidata_worst = ['Worst_' + Definednameofdata]
+        voidata_mean = ['Mean_' + Definednameofdata]
+        voidata_median = ['Median_' + Definednameofdata]
+        voidata_SD = ['SD_' + Definednameofdata]
         for filesuffex in self.robust_suffix:
             gdfilestoanalysis = fileToanalysis+filesuffex+'.dvh.gd'
             related_funs.writelog(self.path2log,'analysising '+gdfilestoanalysis)
@@ -343,7 +358,20 @@ class class_analysis_gd:
                 VOI_data[-1].append(str('%.4f' % Dmean))
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
-            countRefereindex = 0
+
+        for i in range(1, len(VOI_data[0])):
+            floatvoidata = []
+            for j in range(0, len(VOI_data)):  # reference data start average from voidata 1. skip the reference.
+                floatvoidata.append(float(VOI_data[j][i]))
+            voidata_np = np.array(floatvoidata)
+            voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+            voidata_mean.append(np.mean(voidata_np))
+            voidata_median.append(np.median(voidata_np))
+            voidata_SD.append(np.std(voidata_np))
+        VOI_data.append(voidata_worst)
+        VOI_data.append(voidata_mean)
+        VOI_data.append(voidata_median)
+        VOI_data.append(voidata_SD)
         return VOI_data
     def AnalyzeDVH(self): # return write data : vol,pdose,parameter,3D,4D1,4D2...
         #get the voiname, voivolume, voiprescirbeddose, voiparameter info
