@@ -193,16 +193,23 @@ class class_analysis_gd:
 
         for filesuffex in self.robust_suffix:
             gdfilestoanalysis = fileToanalysis+filesuffex+'.dvh.gd'
-            VOI_data.append([Definednameofdata + filesuffex+'_dev'])
+            VOI_data.append([Definednameofdata + filesuffex+'_dev']) # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex=0
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
+                targetDose = self.targetdoselist[targetinfo]
+
+                #prepareing data for calcuation of CI
+                if self.lowerdoseforext > float(targetDose):
+                    self.lowerdoseforext = float(targetDose)
+                self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
+
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
-                                                                                               'Target', float(self.PlanDose),
+                                                                                               'Target', float(targetDose),
                                                                                                self.Vxx, self.Dxx,
                                                                                                self.Dcc)
                 if referenceDATA==True:
-                    VOI_data[-1][0]=Definednameofdata + filesuffex
+                    VOI_data[-1][0]=Definednameofdata + filesuffex # modify the first row(name)
                     pass
                 else:
                     Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],Dmin)
@@ -251,9 +258,10 @@ class class_analysis_gd:
                         self.referenceDATAforCompare.append(Dccinfo)
 
             for oarinfo in self.oarnamelist:
+                targetDose=max(self.targetdoselist)
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis,
                                                                                                        oarinfo,'OAR',
-                                                                                                       float(self.PlanDose),
+                                                                                                       float(targetDose),
                                                                                                        self.Vxx,self.Dxx,
                                                                                                        self.Dcc)
 
@@ -304,8 +312,14 @@ class class_analysis_gd:
             countRefereindex=0
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
+                targetDose = self.targetdoselist[targetinfo]
+                # prepareing data for calcuation of CI
+                if self.lowerdoseforext > float(targetDose):
+                    self.lowerdoseforext = float(targetDose)
+                self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
+
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
-                                                                                               'Target', float(self.PlanDose),
+                                                                                               'Target', float(targetDose),
                                                                                                self.Vxx, self.Dxx,
                                                                                                self.Dcc)
                 Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],Dmin)
