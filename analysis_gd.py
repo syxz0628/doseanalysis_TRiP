@@ -200,8 +200,7 @@ class class_analysis_gd:
                 targetDose = self.targetdoselist[targetinfo]
 
                 #prepareing data for calcuation of CI
-                if self.lowerdoseforext > float(targetDose):
-                    self.lowerdoseforext = float(targetDose)
+                self.lowerdoseforext = float(targetDose)
                 self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
 
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
@@ -314,8 +313,7 @@ class class_analysis_gd:
                 targetName = self.targetnamelist[targetinfo]
                 targetDose = self.targetdoselist[targetinfo]
                 # prepareing data for calcuation of CI
-                if self.lowerdoseforext > float(targetDose):
-                    self.lowerdoseforext = float(targetDose)
+                self.lowerdoseforext = float(targetDose)
                 self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
 
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
