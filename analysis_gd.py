@@ -157,7 +157,7 @@ class class_analysis_gd:
         self.writelinesinfo.append(VOI_pres_Dose)
         self.writelinesinfo.append(VOI_Parameter)
         self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
-        savedata_fildname = self.savepath + self.patientID + '_' + self.planname + '_reference' + '.tx'
+        savedata_fildname = self.savepath +'reference_analysis' + '.tx'
         with open(savedata_fildname, 'a+') as savefileinfo:
             # savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
             reverseinfo = list(zip(*self.writelinesinfo))
