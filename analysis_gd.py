@@ -273,19 +273,19 @@ class class_analysis_gd:
                         if Vxxlist[vxxno] == -1:
                             print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate')
                         Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                                                                   Vxxlist[vxxno])
+                                                                   Vxxlist[vxxno])*self.referenceDATAforCompare[countRefereindex]
                         countRefereindex += 1
                     for Dxxno in range(0, len(Dxxlist)):
                         if Dxxlist[Dxxno] == -1:
                             print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate')
                         Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                                                                   Dxxlist[Dxxno])
+                                                                   Dxxlist[Dxxno])*self.referenceDATAforCompare[countRefereindex]
                         countRefereindex += 1
                     for Dccno in range(0, len(Dcclist)):
                         if Dcclist[Dccno] == -1:
                             print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate')
                         Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                                                                  Dcclist[Dccno])
+                                                                  Dcclist[Dccno])*self.referenceDATAforCompare[countRefereindex]
                         countRefereindex += 1
 
                 VOI_data[-1].append(str('%.4f' % Dmin))
