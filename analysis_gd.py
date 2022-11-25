@@ -231,7 +231,7 @@ class class_analysis_gd:
                     countRefereindex += 1
                     Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
                     countRefereindex += 1
-                    #Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
+                    # Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
                     countRefereindex += 1
                     CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
                     countRefereindex += 1
