@@ -309,7 +309,6 @@ class class_analysis_gd:
         VOI_data.append(voidata_mean)
         VOI_data.append(voidata_median)
         VOI_data.append(voidata_SD)
-        startaveragepoint = 0
         return VOI_data
 
     def getDVHMetricsFromFileByVOI(self,filename,voiname,voitype,voidose,voiVxx,voiDxx,voiDcc):
