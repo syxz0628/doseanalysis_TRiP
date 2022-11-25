@@ -130,174 +130,6 @@ class class_analysis_gd:
                     for onedata in oneline:
                         savefileinfo.writelines(str(onedata)+' ')
                     savefileinfo.write('\n')
-    def AnalyzeDVHReference(self,fileToanalysis,Definednameofdata): # return write data: vol, pdose, parameter.
-        # get the voiname, voivolume, voiprescirbeddose, voiparameter info
-        patientIDToW = ['ID']
-        plannameToW = ['Planname']
-        VOI_names = ['OAR/Tname']
-        VOI_volumes = ['Volume']
-        VOI_pres_Dose = ['Dose/Fractions']
-        VOI_Parameter = ['parameter']
-
-
-        for targetinfo in range(0,len(self.targetnamelist)):
-            targetName=self.targetnamelist[targetinfo]
-
-            dIrrVolcc = -1
-            dIrrVolcc = self.getIrrVolByVOI(fileToanalysis+self.robust_suffix[0]+'.dvh.gd', targetName) / 1000  # mm^3 --> cc
-            if dIrrVolcc <= 0.0:
-                writeinfo = "Voi " + targetName + " did not receive any dose/doesn't exit."
-                related_funs.writelog(self.path2log, writeinfo)
-
-            for i in range(0, len(self.Vxx)+len(self.Dxx)+len(self.Dcc)+5): #vxx dxx dcc
-                patientIDToW.append(self.patientID)
-                plannameToW.append(self.planname)
-                VOI_names.append(self.targetnamelist[targetinfo])
-                VOI_volumes.append(dIrrVolcc)
-                VOI_pres_Dose.append(self.targetdoselist[targetinfo])
-
-            VOI_Parameter.append('min')
-            VOI_Parameter.append('max')
-            VOI_Parameter.append('mean')
-            VOI_Parameter.append('CI')
-            VOI_Parameter.append('HI')
-            for j in self.Vxx:
-                VOI_Parameter.append('V' + str(j) + '%')
-            for m in self.Dxx:
-                VOI_Parameter.append('D' + str(m) + '%')
-            for n in self.Dcc:
-                VOI_Parameter.append('D' + str(n) + 'cc')
-        for oarinfo in self.oarnamelist:
-
-            dIrrVolcc = -1
-            dIrrVolcc = self.getIrrVolByVOI(fileToanalysis+self.robust_suffix[0]+'.dvh.gd', oarinfo) / 1000  # mm^3 --> cc
-            if dIrrVolcc <= 0.0:
-                writeinfo = "Voi " + oarinfo + " did not receive any dose/doesn't exit."
-                related_funs.writelog(self.path2log, writeinfo)
-
-            for i in range(0, len(self.Dcc) + 1):  # dcc mean
-                patientIDToW.append(self.patientID)
-                plannameToW.append(self.planname)
-                VOI_names.append(oarinfo)
-                VOI_volumes.append(str(dIrrVolcc))
-                VOI_pres_Dose.append('/' + str(self.fractions) + 'Fxs/')
-            VOI_Parameter.append('mean')
-            for n in self.Dcc:
-                VOI_Parameter.append('D' + str(n) + 'cc')
-        # start get dose DVH info.
-        VOI_data = []
-        referenceDATA = True
-        voidata_worst = ['Worst_' + Definednameofdata]
-        voidata_mean = ['Mean_' + Definednameofdata]
-        voidata_median = ['Median_' + Definednameofdata]
-        voidata_SD = ['SD_' + Definednameofdata]
-
-        for filesuffex in self.robust_suffix:
-            gdfilestoanalysis = fileToanalysis+filesuffex+'.dvh.gd'
-            VOI_data.append([Definednameofdata + filesuffex+'_dev']) # add first row(name). for reference colume, it will change acorrodingly.
-            countRefereindex=0
-            for targetinfo in range(0, len(self.targetnamelist)):
-                targetName = self.targetnamelist[targetinfo]
-                targetDose = self.targetdoselist[targetinfo]
-
-                #prepareing data for calcuation of CI
-                self.lowerdoseforext = float(targetDose)
-                self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
-
-                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
-                                                                                               'Target', float(targetDose),
-                                                                                               self.Vxx, self.Dxx,
-                                                                                               self.Dcc)
-                if referenceDATA==True:
-                    VOI_data[-1][0]=Definednameofdata + filesuffex # modify the first row(name)
-                    pass
-                else:
-                    Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],Dmin)
-                    countRefereindex += 1
-                    Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
-                    countRefereindex += 1
-                    Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
-                    countRefereindex += 1
-                    CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
-                    countRefereindex += 1
-                    HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
-                    countRefereindex += 1
-                    for vxxno in range(0,len(Vxxlist)):
-                        Vxxlist[vxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Vxxlist[vxxno])
-                        countRefereindex += 1
-                    for Dxxno in range(0,len(Dxxlist)):
-                        Dxxlist[Dxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dxxlist[Dxxno])
-                        countRefereindex += 1
-                    for Dccno in range(0,len(Dcclist)):
-                        Dcclist[Dccno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dcclist[Dccno])
-                        countRefereindex += 1
-
-                VOI_data[-1].append(str('%.4f' % Dmin))
-                VOI_data[-1].append(str('%.4f' % Dmax))
-                VOI_data[-1].append(str('%.4f' % Dmean))
-                VOI_data[-1].append(str('%.4f' % CI))
-                VOI_data[-1].append(str('%.4f' % HI))
-                for Vxxinfo in Vxxlist:
-                    VOI_data[-1].append(str('%.4f' % Vxxinfo))
-                for Dxxinfo in Dxxlist:
-                    VOI_data[-1].append(str('%.4f' % Dxxinfo))
-                for Dccinfo in Dcclist:
-                    VOI_data[-1].append(str('%.4f' % Dccinfo))
-
-                if referenceDATA==True:
-                    self.referenceDATAforCompare.append(Dmin)
-                    self.referenceDATAforCompare.append(Dmax)
-                    self.referenceDATAforCompare.append(Dmean)
-                    self.referenceDATAforCompare.append(CI)
-                    self.referenceDATAforCompare.append(HI)
-                    for Vxxinfo in Vxxlist:
-                        self.referenceDATAforCompare.append(Vxxinfo)
-                    for Dxxinfo in Dxxlist:
-                        self.referenceDATAforCompare.append(Dxxinfo)
-                    for Dccinfo in Dcclist:
-                        self.referenceDATAforCompare.append(Dccinfo)
-
-            for oarinfo in self.oarnamelist:
-                targetDose=max(self.targetdoselist)
-                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis,
-                                                                                                       oarinfo,'OAR',
-                                                                                                       float(targetDose),
-                                                                                                       self.Vxx,self.Dxx,
-                                                                                                       self.Dcc)
-
-                if referenceDATA==True:
-                    pass
-                else:
-                    Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
-                    countRefereindex+=1
-                    for Dccno in range(0,len(Dcclist)):
-                        Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dcclist[Dccno])
-                        countRefereindex += 1
-
-                VOI_data[-1].append(str('%.4f' % Dmean))
-                for Dccinfo in Dcclist:
-                    VOI_data[-1].append(str('%.4f' % Dccinfo))
-
-                if referenceDATA==True:
-                    self.referenceDATAforCompare.append(Dmean)
-                    for Dccinfo in Dcclist:
-                        self.referenceDATAforCompare.append(Dccinfo)
-            referenceDATA = False
-
-        for i in range(1,len(VOI_data[0])):
-            floatvoidata=[]
-            for j in range(1,len(VOI_data)): # reference data start average from voidata 1. skip the reference.
-                floatvoidata.append(float(VOI_data[j][i]))
-            voidata_np = np.array(floatvoidata)
-            voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
-            voidata_mean.append(np.mean(voidata_np))
-            voidata_median.append(np.median(voidata_np))
-            voidata_SD.append(np.std(voidata_np))
-        VOI_data.append(voidata_worst)
-        VOI_data.append(voidata_mean)
-        VOI_data.append(voidata_median)
-        VOI_data.append(voidata_SD)
-        return patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data
     def AnalyzeDVHPre(self,fileToanalysis): # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['ID']
@@ -395,12 +227,18 @@ class class_analysis_gd:
                     HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
                     countRefereindex += 1
                     for vxxno in range(0,len(Vxxlist)):
+                        if Vxxlist[vxxno] == -1:
+                            print('V',self.Vxx[vxxno],' of ' + targetName + ' is not possible to calculate')
                         Vxxlist[vxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Vxxlist[vxxno])
                         countRefereindex += 1
                     for Dxxno in range(0,len(Dxxlist)):
+                        if Dxxlist[Dxxno] == -1:
+                            print('V',self.Dxx[Dxxno],' of ' + targetName + ' is not possible to calculate')
                         Dxxlist[Dxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dxxlist[Dxxno])
                         countRefereindex += 1
                     for Dccno in range(0,len(Dcclist)):
+                        if Dcclist[Dccno] == -1:
+                            print('V',self.Dcc[Dccno],' of ' + targetName + ' is not possible to calculate')
                         Dcclist[Dccno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dcclist[Dccno])
                         countRefereindex += 1
 
@@ -470,92 +308,7 @@ class class_analysis_gd:
         VOI_data.append(voidata_median)
         VOI_data.append(voidata_SD)
         return VOI_data
-    def AnalyzeDVH_Non_Reference(self,fileToanalysis,Definednameofdata): # return write data: vol, pdose, parameter.
-        # start get dose DVH info.
-        VOI_data = []
-        voidata_worst = ['Worst_' + Definednameofdata]
-        voidata_mean = ['Mean_' + Definednameofdata]
-        voidata_median = ['Median_' + Definednameofdata]
-        voidata_SD = ['SD_' + Definednameofdata]
-        for filesuffex in self.robust_suffix:
-            gdfilestoanalysis = fileToanalysis+filesuffex+'.dvh.gd'
-            related_funs.writelog(self.path2log,'analysising '+gdfilestoanalysis)
-            VOI_data.append([Definednameofdata + filesuffex+'_dev'])
-            countRefereindex=0
-            for targetinfo in range(0, len(self.targetnamelist)):
-                targetName = self.targetnamelist[targetinfo]
-                targetDose = self.targetdoselist[targetinfo]
-                # prepareing data for calcuation of CI
-                self.lowerdoseforext = float(targetDose)
-                self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
 
-                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis, targetName,
-                                                                                               'Target', float(targetDose),
-                                                                                               self.Vxx, self.Dxx,
-                                                                                               self.Dcc)
-                Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],Dmin)
-                countRefereindex+=1
-                Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
-                countRefereindex += 1
-                Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
-                countRefereindex += 1
-                CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
-                countRefereindex += 1
-                HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
-                countRefereindex += 1
-                for vxxno in range(0,len(Vxxlist)):
-                    Vxxlist[vxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Vxxlist[vxxno])
-                    countRefereindex += 1
-                for Dxxno in range(0,len(Dxxlist)):
-                    Dxxlist[Dxxno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dxxlist[Dxxno])
-                    countRefereindex += 1
-                for Dccno in range(0,len(Dcclist)):
-                    Dcclist[Dccno]=self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dcclist[Dccno])
-                    countRefereindex += 1
-
-                VOI_data[-1].append(str('%.4f' % Dmin))
-                VOI_data[-1].append(str('%.4f' % Dmax))
-                VOI_data[-1].append(str('%.4f' % Dmean))
-                VOI_data[-1].append(str('%.4f' % CI))
-                VOI_data[-1].append(str('%.4f' % HI))
-                for Vxxinfo in Vxxlist:
-                    VOI_data[-1].append(str('%.4f' % Vxxinfo))
-                for Dxxinfo in Dxxlist:
-                    VOI_data[-1].append(str('%.4f' % Dxxinfo))
-                for Dccinfo in Dcclist:
-                    VOI_data[-1].append(str('%.4f' % Dccinfo))
-
-            for oarinfo in self.oarnamelist:
-                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(gdfilestoanalysis,
-                                                                                                       oarinfo,'OAR',
-                                                                                                       float(self.PlanDose),
-                                                                                                       self.Vxx,self.Dxx,
-                                                                                                       self.Dcc)
-
-                Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
-                countRefereindex+=1
-                for Dccno in range(0,len(Dcclist)):
-                    Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dcclist[Dccno])
-                    countRefereindex += 1
-
-                VOI_data[-1].append(str('%.4f' % Dmean))
-                for Dccinfo in Dcclist:
-                    VOI_data[-1].append(str('%.4f' % Dccinfo))
-
-        for i in range(1, len(VOI_data[0])):
-            floatvoidata = []
-            for j in range(0, len(VOI_data)):  # reference data start average from voidata 1. skip the reference.
-                floatvoidata.append(float(VOI_data[j][i]))
-            voidata_np = np.array(floatvoidata)
-            voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
-            voidata_mean.append(np.mean(voidata_np))
-            voidata_median.append(np.median(voidata_np))
-            voidata_SD.append(np.std(voidata_np))
-        VOI_data.append(voidata_worst)
-        VOI_data.append(voidata_mean)
-        VOI_data.append(voidata_median)
-        VOI_data.append(voidata_SD)
-        return VOI_data
     def AnalyzeDVH(self): # return write data : vol,pdose,parameter,3D,4D1,4D2...
         #get the voiname, voivolume, voiprescirbeddose, voiparameter info
         for voiname,voitype,voidose,voiVxx,voiDxx,voiDcc in self.voilist:
@@ -693,12 +446,12 @@ class class_analysis_gd:
             #finding D95 & D5
             #D5  = self.D_n(5.0,[yvalues],xvalues)[0] 
             #D95 = self.D_n(95,[yvalues],xvalues)[0]
-            D5=self.fun_Dxx(5, xvalues, yvalues)
-            D95=self.fun_Dxx(95, xvalues, yvalues)
+            D5=self.fun_Dxx(5, xvalues, yvalues,voiname)
+            D95=self.fun_Dxx(95, xvalues, yvalues,voiname)
             HI = D5 - D95
             #CI = self.getCIByVOI(filename,voiname)
 
-            V95 = self.fun_Vxx(95, xvalues, yvalues)
+            V95 = self.fun_Vxx(95, xvalues, yvalues,voiname)
             if dIrrVolcc != 0:
                 CI = self.ExtV95/float(dIrrVolcc)
                 #CN = float(V95 * V95 / (CI * 100.))
@@ -709,19 +462,19 @@ class class_analysis_gd:
                 related_funs.writelog(self.path2log, writeinfo)
         for temp in voiVxx:
             try:
-                Vxxlist.append(self.fun_Vxx(temp,xvalues,yvalues))
+                Vxxlist.append(self.fun_Vxx(temp,xvalues,yvalues,voiname))
             except:
                 Vxxlist.append(-1)
         for temp in voiDxx:
             DVal=temp
             try:
-                Dxxlist.append(self.fun_Dxx(temp,xvalues,yvalues))
+                Dxxlist.append(self.fun_Dxx(temp,xvalues,yvalues,voiname))
             except:
                 Dxxlist.append(-1)
         for temp in voiDcc:
             Dval=float(temp)/float(dIrrVolcc)*100.00
             #try:
-            Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues)*float(voidose)/100.00)
+            Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues)*float(voidose)/100.00,voiname)
             #except:
             #    Dcclist.append(-1)
         #print(Dcclist)
@@ -746,7 +499,7 @@ class class_analysis_gd:
         if (voitype != "EXT"):
             print('wrong input, this is for External structure only')
         else:
-            percen=self.fun_Vxx(95, xvalues, yvalues)
+            percen=self.fun_Vxx(95, xvalues, yvalues,voiname)
             ExtV95 = percen/100*dIrrVolcc # abs v95%
         return ExtV95
 
@@ -955,7 +708,7 @@ class class_analysis_gd:
                     n = V_left[i][1] - m * V_left[i][0]
                     Vnn.append( (nn - n)/m )
             return Vnn    
-    def fun_Vxx(self,xx_per,Dose_values,Volume_values):
+    def fun_Vxx(self,xx_per,Dose_values,Volume_values,voiname):
         Vxx=-1
         for i in range(0, len(Dose_values)):
             if Dose_values[i]==xx_per:
@@ -967,10 +720,11 @@ class class_analysis_gd:
                 Vxx=self.fun_trend(float(xx_per),Dose_values[i-1],Dose_values[i],Volume_values[i-1],Volume_values[i])
                 break
         if Vxx==-1:
-            print('V',xx_per,'is not possible to calculate')
+            #print('V',xx_per,' of ' + voiname + ' is not possible to calculate')
+            pass
         return Vxx
     
-    def fun_Dxx(self,xx_per,Dose_values,Volume_values):
+    def fun_Dxx(self,xx_per,Dose_values,Volume_values,voiname):
         Dxx=-1
         for i in range(0, len(Volume_values)):
             if Volume_values[i]==xx_per:
@@ -982,7 +736,8 @@ class class_analysis_gd:
                 Dxx=self.fun_trend(float(xx_per),Volume_values[i-1],Volume_values[i],Dose_values[i-1],Dose_values[i])
                 break
         if Dxx==-1:
-            print('D',xx_per,'is not possible to calculate')
+            #print('D',xx_per,' for '+voiname+' is not possible to calculate')
+            pass
         return Dxx
     
     def fun_trend(self,newX,X1,X2,Y1,Y2):
