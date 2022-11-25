@@ -231,7 +231,7 @@ class class_analysis_gd:
                     countRefereindex += 1
                     Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
                     countRefereindex += 1
-                    Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
+                    #Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
                     countRefereindex += 1
                     CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
                     countRefereindex += 1
@@ -240,20 +240,20 @@ class class_analysis_gd:
                     for vxxno in range(0, len(Vxxlist)):
                         if Vxxlist[vxxno] == -1:
                             print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate')
-                        #Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                        #                                           Vxxlist[vxxno])*self.referenceDATAforCompare[countRefereindex] # use absolute variation compare to reaferece. dev=Dcom95%-Dref95%
+                        Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                   Vxxlist[vxxno])
                         countRefereindex += 1
                     for Dxxno in range(0, len(Dxxlist)):
                         if Dxxlist[Dxxno] == -1:
                             print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate')
-                        #Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                        #                                           Dxxlist[Dxxno])*self.referenceDATAforCompare[countRefereindex]
+                        Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                   Dxxlist[Dxxno])
                         countRefereindex += 1
                     for Dccno in range(0, len(Dcclist)):
                         if Dcclist[Dccno] == -1:
                             print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate')
-                        #Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                        #                                           Dcclist[Dccno])*self.referenceDATAforCompare[countRefereindex]
+                        Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                   Dcclist[Dccno])
                         countRefereindex += 1
 
                 VOI_data[-1].append(str('%.4f' % Dmin))
