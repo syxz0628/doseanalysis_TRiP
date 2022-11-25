@@ -208,8 +208,7 @@ class class_analysis_gd:
 
         for filesuffex in self.robust_suffix:
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
-            VOI_data.append([
-                                Definednameofdata + filesuffex + '_dev'])  # add first row(name). for reference colume, it will change acorrodingly.
+            VOI_data.append([Definednameofdata + filesuffex + '_dev'])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
@@ -234,7 +233,7 @@ class class_analysis_gd:
                     countRefereindex += 1
                     Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
                     countRefereindex += 1
-                    CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
+                    #CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
                     countRefereindex += 1
                     HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
                     countRefereindex += 1
@@ -375,9 +374,7 @@ class class_analysis_gd:
             D5 = self.fun_Dxx(5, xvalues, yvalues, voiname)
             D95 = self.fun_Dxx(95, xvalues, yvalues, voiname)
             HI = D5 - D95
-            # CI = self.getCIByVOI(filename,voiname)
 
-            V95 = self.fun_Vxx(95, xvalues, yvalues, voiname)
             if dIrrVolcc != 0:
                 CI = self.ExtV95 / float(dIrrVolcc)
                 # CN = float(V95 * V95 / (CI * 100.))
