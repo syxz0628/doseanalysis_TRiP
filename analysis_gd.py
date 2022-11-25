@@ -36,7 +36,7 @@ class class_analysis_gd:
         elif self.robustevaluation == '9':
             self.robust_suffix = ['_nom', '_hd', '_ld', '_nx', '_ny', '_nz', '_px', '_py', '_pz']
         else:
-            self.robust=False
+            self.robusteva=False
             self.robust_suffix = ['']
 
         self.FileList = path2gdlist
