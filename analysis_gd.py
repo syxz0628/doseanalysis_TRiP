@@ -581,11 +581,14 @@ class class_analysis_gd:
 	
     def getIrrVolByVOI(self,path, VOIstr):
         irrvol=-1
-        with open(path,'r') as fin:
-            for line in fin:
-                if line.startswith("c: "+VOIstr):
-                    irrvol=float(line.split()[7])
-                    break
+        try:
+            with open(path,'r') as fin:
+                for line in fin:
+                    if line.startswith("c: "+VOIstr):
+                        irrvol=float(line.split()[7])
+                        break
+        except:
+            print('error, check ',path)
         return irrvol
 	
     def getCIByVOI(self,path, VOIstr):
