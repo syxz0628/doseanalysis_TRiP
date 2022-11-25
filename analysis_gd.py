@@ -474,7 +474,7 @@ class class_analysis_gd:
         for temp in voiDcc:
             Dval=float(temp)/float(dIrrVolcc)*100.00
             #try:
-            Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues)*float(voidose)/100.00,voiname)
+            Dcclist.append(self.fun_Dxx(Dval,xvalues,yvalues,voiname)*float(voidose)/100.00)
             #except:
             #    Dcclist.append(-1)
         #print(Dcclist)
