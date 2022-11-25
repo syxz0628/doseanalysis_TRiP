@@ -73,20 +73,19 @@ class class_analysis_gd:
         for fileNo in range(0,len(self.FileList)):
             fileToanalysis=self.FileList[fileNo]
             Definednameofdata=self.nameofgdlist[fileNo]
+
+            VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
             if referencedata:
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
                 #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
                 patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter = self.AnalyzeDVHPre(fileToanalysis)
-                VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
                 self.writelinesinfo.append(patientIDToW)
                 self.writelinesinfo.append(plannameToW)
                 self.writelinesinfo.append(VOI_names)
                 self.writelinesinfo.append(VOI_volumes)
                 self.writelinesinfo.append(VOI_pres_Dose)
                 self.writelinesinfo.append(VOI_Parameter)
-                self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
                 referencedata = False
-            VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
             self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
 
             # write gamma data to line
@@ -353,13 +352,17 @@ class class_analysis_gd:
                 VOI_Parameter.append('D' + str(n) + 'cc')
         # start get dose DVH info.
         return patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter
-    def AnalyzeDVHvoidata(self,fileToanalysis,Definednameofdata,ContainsReference): # return write data: vol, pdose, parameter.
+    def AnalyzeDVHvoidata(self,fileToanalysis,Definednameofdata,referencedata): # return write data: vol, pdose, parameter.
         # start get dose DVH info.
         VOI_data = []
         voidata_worst = ['Worst_' + Definednameofdata]
         voidata_mean = ['Mean_' + Definednameofdata]
         voidata_median = ['Median_' + Definednameofdata]
         voidata_SD = ['SD_' + Definednameofdata]
+        ContainsReference=False
+        if referencedata:
+            ContainsReference=True
+
 
         for filesuffex in self.robust_suffix:
             gdfilestoanalysis = fileToanalysis+filesuffex+'.dvh.gd'
@@ -453,7 +456,7 @@ class class_analysis_gd:
                     startaveragepoint = 1  # reference data start average from voidata 1. skip the reference.
 
             ContainsReference = False
-        for i in range(1,len(VOI_data[0])):
+        for i in range(1,len(VOI_data[0])): # calculate worst, mean, median, sd
             floatvoidata=[]
             for j in range(startaveragepoint,len(VOI_data)):
                 floatvoidata.append(float(VOI_data[j][i]))
