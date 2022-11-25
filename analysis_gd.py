@@ -192,8 +192,10 @@ class class_analysis_gd:
         voidata_median = ['Median_' + Definednameofdata]
         voidata_SD = ['SD_' + Definednameofdata]
         ContainsReference=False
+        startaveragepoint = 0
         if referencedata:
             ContainsReference=True
+            startaveragepoint = 1
 
 
         for filesuffex in self.robust_suffix:
@@ -286,17 +288,17 @@ class class_analysis_gd:
                 VOI_data[-1].append(str('%.4f' % Dmean))
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
-                startaveragepoint = 0
+
                 if ContainsReference:
                     self.referenceDATAforCompare.append(Dmean)
                     for Dccinfo in Dcclist:
                         self.referenceDATAforCompare.append(Dccinfo)
-                    startaveragepoint = 1  # reference data start average from voidata 1. skip the reference.
+                      # reference data start average from voidata 1. skip the reference.
 
             ContainsReference = False
         for i in range(1,len(VOI_data[0])): # calculate worst, mean, median, sd
             floatvoidata=[]
-            for j in range(startaveragepoint,len(VOI_data)):
+            for j in range(startaveragepoint ,len(VOI_data)):
                 floatvoidata.append(float(VOI_data[j][i]))
             voidata_np = np.array(floatvoidata)
             voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
@@ -307,6 +309,7 @@ class class_analysis_gd:
         VOI_data.append(voidata_mean)
         VOI_data.append(voidata_median)
         VOI_data.append(voidata_SD)
+        startaveragepoint = 0
         return VOI_data
 
     def getDVHMetricsFromFileByVOI(self,filename,voiname,voitype,voidose,voiVxx,voiDxx,voiDcc):
