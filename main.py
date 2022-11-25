@@ -23,6 +23,7 @@ if __name__=="__main__":
     parser.add_argument("-r", "--robustevaluation", required=False, help="flag if DVH files are robust evaluation files, 21 or 9, Default None")
     parser.add_argument("-n", "--nameofgdlist", required=True, help="name of the data, such as 3DRecon, 4DPerRSC,4DMBR,,3DReview_CTxx, 4DRePerRSC_CTxx")
     parser.add_argument("-g", "--path2gdlist", required=True, help="path to gd file")
+    parser.add_argument("-rs", "--referenceSpecial", required=False, action='store_true', help="analysis Reference data only")
     parser.add_argument("-fd", "--fourDgdlist", required=False, help="path to 4D gd files for accumulation dose analysis")
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
@@ -44,7 +45,13 @@ if __name__=="__main__":
     robustevaluation=args.robustevaluation
     path2gdlist = args.path2gdlist.split(',')
     nameofgdlist = args.nameofgdlist.split(',')
+    referenceSpecial=args.referenceSpecial
 
 # call analysis_gd function
+
     analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist)
-    analysis_gd_data.fun_analysis_gd(dose_shown_in_gd=3)
+    if referenceSpecial:
+        analysis_gd_data.fun_analysis_refonly(dose_shown_in_gd=3)
+    else:
+        analysis_gd_data.fun_analysis_gd(dose_shown_in_gd=3)
+

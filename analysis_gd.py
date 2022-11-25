@@ -28,6 +28,7 @@ class class_analysis_gd:
         self.savepath = savepath
         self.gammaEva = gammaEva
         self.robustevaluation = robustevaluation
+        self.robusteva = True
         if self.robustevaluation == '21':
             self.robust_suffix = ['_nom', '_nx', '_ny', '_nz', '_px', '_py', '_pz',
                                   '_hd', '_hd_nx', '_hd_ny', '_hd_nz', '_hd_px', '_hd_py', '_hd_pz',
@@ -35,6 +36,7 @@ class class_analysis_gd:
         elif self.robustevaluation == '9':
             self.robust_suffix = ['_nom', '_hd', '_ld', '_nx', '_ny', '_nz', '_px', '_py', '_pz']
         else:
+            self.robust=False
             self.robust_suffix = ['']
 
         self.FileList = path2gdlist
@@ -135,6 +137,36 @@ class class_analysis_gd:
                         savefileinfo.writelines(str(onedata) + ' ')
                     savefileinfo.write('\n')
 
+    def fun_analysis_refonly(self,dose_shown_in_gd):
+        # dose_shown_in_gd is the dose written in the exec file, for SPHIC momi cases this value was set to 3 for all plans.
+        self.PlanDose = dose_shown_in_gd
+        fileNo=0
+        fileToanalysis = self.FileList[fileNo]
+        Definednameofdata = self.nameofgdlist[fileNo]
+        referencedata=True
+        VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
+
+        # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
+        #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
+        patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter = self.AnalyzeDVHPre(
+            fileToanalysis)
+        self.writelinesinfo.append(patientIDToW)
+        self.writelinesinfo.append(plannameToW)
+        self.writelinesinfo.append(VOI_names)
+        self.writelinesinfo.append(VOI_volumes)
+        self.writelinesinfo.append(VOI_pres_Dose)
+        self.writelinesinfo.append(VOI_Parameter)
+        self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
+        savedata_fildname = self.savepath + self.patientID + '_' + self.planname + '_reference' + '.tx'
+        with open(savedata_fildname, 'a+') as savefileinfo:
+            # savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
+            reverseinfo = list(zip(*self.writelinesinfo))
+            # reverseinfo = self.writelinesinfo
+            for oneline in reverseinfo:
+                for onedata in oneline:
+                    savefileinfo.writelines(str(onedata) + ' ')
+                savefileinfo.write('\n')
+
     def AnalyzeDVHPre(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['ID']
@@ -227,33 +259,33 @@ class class_analysis_gd:
                     VOI_data[-1][0] = Definednameofdata + filesuffex  # modify the first row(name)
                     pass
                 else:
-                    #Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmin)
+                    Dmin = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmin)
                     countRefereindex += 1
-                    #Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
+                    Dmax = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmax)
                     countRefereindex += 1
-                    #Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
+                    Dmean = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], Dmean)
                     countRefereindex += 1
-                    #CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
+                    CI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], CI)
                     countRefereindex += 1
-                    #HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
+                    HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
                     countRefereindex += 1
                     for vxxno in range(0, len(Vxxlist)):
                         if Vxxlist[vxxno] == -1:
                             print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate')
-                        #Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                        #                                           Vxxlist[vxxno])
+                        Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                   Vxxlist[vxxno])
                         countRefereindex += 1
                     for Dxxno in range(0, len(Dxxlist)):
                         if Dxxlist[Dxxno] == -1:
                             print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate')
-                        #Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                        #                                           Dxxlist[Dxxno])
+                        Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                   Dxxlist[Dxxno])
                         countRefereindex += 1
                     for Dccno in range(0, len(Dcclist)):
                         if Dcclist[Dccno] == -1:
                             print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate')
-                        #Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
-                         #                                          Dcclist[Dccno])
+                        Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
+                                                                  Dcclist[Dccno])
                         countRefereindex += 1
 
                 VOI_data[-1].append(str('%.4f' % Dmin))
@@ -310,19 +342,20 @@ class class_analysis_gd:
                     # reference data start average from voidata 1. skip the reference.
 
             ContainsReference = False
-        for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
-            floatvoidata = []
-            for j in range(startaveragepoint, len(VOI_data)):
-                floatvoidata.append(float(VOI_data[j][i]))
-            voidata_np = np.array(floatvoidata)
-            voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
-            voidata_mean.append(np.mean(voidata_np))
-            voidata_median.append(np.median(voidata_np))
-            voidata_SD.append(np.std(voidata_np))
-        VOI_data.append(voidata_worst)
-        VOI_data.append(voidata_mean)
-        VOI_data.append(voidata_median)
-        VOI_data.append(voidata_SD)
+        if self.robusteva:
+            for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
+                floatvoidata = []
+                for j in range(startaveragepoint, len(VOI_data)):
+                    floatvoidata.append(float(VOI_data[j][i]))
+                voidata_np = np.array(floatvoidata)
+                voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+                voidata_mean.append(np.mean(voidata_np))
+                voidata_median.append(np.median(voidata_np))
+                voidata_SD.append(np.std(voidata_np))
+            VOI_data.append(voidata_worst)
+            VOI_data.append(voidata_mean)
+            VOI_data.append(voidata_median)
+            VOI_data.append(voidata_SD)
         return VOI_data
 
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
