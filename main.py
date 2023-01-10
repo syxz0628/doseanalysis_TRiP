@@ -48,10 +48,13 @@ if __name__=="__main__":
     path2gdlist = args.path2gdlist.split(',')
     nameofgdlist = args.nameofgdlist.split(',')
     referenceSpecial=args.referenceSpecial
+    OptMethod=args.OptMethod
 
 # call analysis_gd function
 
-    analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,targetnamelist,targetdoselist,oarnamelist,externalname,fractions,savepath,gammaEva,robustevaluation,path2gdlist,nameofgdlist)
+    analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
+                                                   oarnamelist, externalname,fractions,savepath,gammaEva,
+                                                   robustevaluation,path2gdlist,nameofgdlist)
     if referenceSpecial:
         analysis_gd_data.fun_analysis_refonly(dose_shown_in_gd=3)
     else:
