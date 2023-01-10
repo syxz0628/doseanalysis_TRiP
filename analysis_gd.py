@@ -494,8 +494,8 @@ class class_analysis_gd:
             ContainsReference = False
         if self.robusteva:
             collectedparameters=self.fun_parameterstobeanalysised()
+            countofcollecteddata = 0
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
-                countofcollecteddata=0
                 floatvoidata = []
                 for j in range(startaveragepoint, len(VOI_data)):
                     floatvoidata.append(float(VOI_data[j][i]))
