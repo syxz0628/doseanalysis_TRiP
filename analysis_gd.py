@@ -913,7 +913,7 @@ class class_analysis_gd:
                 whoistheworst.append(1)
         for oarinfo in range(0, len(self.oarnamelist)):
             # for oar mean
-            whoistheworst.append(0)
+            whoistheworst.append(1)
             for Dccinfo in self.Dcc:  # D1cc max is the worst
                 whoistheworst.append(1)
         return whoistheworst
