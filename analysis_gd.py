@@ -85,6 +85,8 @@ class class_analysis_gd:
         for fileNo in range(0, len(self.FileList)):
             fileToanalysis = self.FileList[fileNo]
             Definednameofdata = self.nameofgdlist[fileNo]
+            # do not change order VOI_data first. so self.reference could be available.
+            VOI_data = self.AnalyzeDVHvoidata_abs(fileToanalysis, Definednameofdata, referencedata)
 
             if referencedata: # write some pre information.
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
@@ -101,7 +103,7 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_ionType)
                 referencedata = False
 
-            VOI_data = self.AnalyzeDVHvoidata_abs(fileToanalysis, Definednameofdata, referencedata)
+
             self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
 
             # write gamma data to line
