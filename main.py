@@ -25,6 +25,8 @@ if __name__=="__main__":
     parser.add_argument("-g", "--path2gdlist", required=True, help="path to gd file")
     parser.add_argument("-rs", "--referenceSpecial", required=False, action='store_true', help="analysis Reference data only")
     parser.add_argument("-fd", "--fourDgdlist", required=False, help="path to 4D gd files for accumulation dose analysis")
+    parser.add_argument("-op", "--OptMethod", required=False, help="IMPT or SFO")
+
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
     #                    default=250)

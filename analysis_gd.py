@@ -14,15 +14,18 @@ import gamma
 
 
 class class_analysis_gd:
-    def __init__(self, patientID, planname, targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
+    def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
                  savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist):
         self.patientID = patientID
         self.planname = planname
+        self.OptMethod= OptMethod
+
         self.targetnamelist = targetnamelist
         self.targetdoselist = targetdoselist
         self.oarnamelist = oarnamelist
         self.externalname = externalname
-        self.lowerdoseforext = 999  # take lower prescribed dose for calculate of V95 for Ext
+        self.lowerdoseforext = 999  # take lower
+        # prescribed dose for calculate of V95 for Ext
         self.ExtV95 = 0
         self.fractions = fractions
         self.savepath = savepath
@@ -38,6 +41,10 @@ class class_analysis_gd:
         else:
             self.robusteva=False
             self.robust_suffix = ['']
+
+        self.ionType = 'Carbon' # when use this script, please check if your plan name contains P or C that indicates ion type!!!!
+        if 'p' in self.planname or 'P' in self.planname:
+            self.ionType='Proton'
 
         self.FileList = path2gdlist
         self.nameofgdlist = nameofgdlist
@@ -79,19 +86,22 @@ class class_analysis_gd:
             fileToanalysis = self.FileList[fileNo]
             Definednameofdata = self.nameofgdlist[fileNo]
 
-            VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
-            if referencedata:
+            if referencedata: # write some pre information.
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
                 #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
-                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter = self.AnalyzeDVHPre(
-                    fileToanalysis)
+                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType\
+                    = self.AnalyzeDVHPre(fileToanalysis)
                 self.writelinesinfo.append(patientIDToW)
                 self.writelinesinfo.append(plannameToW)
                 self.writelinesinfo.append(VOI_names)
                 self.writelinesinfo.append(VOI_volumes)
                 self.writelinesinfo.append(VOI_pres_Dose)
                 self.writelinesinfo.append(VOI_Parameter)
+                self.writelinesinfo.append(VOI_OptMethod)
+                self.writelinesinfo.append(VOI_ionType)
                 referencedata = False
+
+            VOI_data = self.AnalyzeDVHvoidata_abs(fileToanalysis, Definednameofdata, referencedata)
             self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
 
             # write gamma data to line
@@ -175,6 +185,8 @@ class class_analysis_gd:
         VOI_volumes = ['Volume']
         VOI_pres_Dose = ['Dose/Fractions']
         VOI_Parameter = ['parameter']
+        VOI_OptMethod = ['OptMethod']
+        VOI_ionType=['IonType']
         for targetinfo in range(0, len(self.targetnamelist)):
             targetName = self.targetnamelist[targetinfo]
 
@@ -191,6 +203,9 @@ class class_analysis_gd:
                 VOI_names.append(self.targetnamelist[targetinfo])
                 VOI_volumes.append(dIrrVolcc)
                 VOI_pres_Dose.append(self.targetdoselist[targetinfo])
+                VOI_OptMethod.append(self.OptMethod)
+                VOI_ionType.append(self.ionType)
+
 
             VOI_Parameter.append('min')
             VOI_Parameter.append('max')
@@ -218,14 +233,15 @@ class class_analysis_gd:
                 VOI_names.append(oarinfo)
                 VOI_volumes.append(str(dIrrVolcc))
                 VOI_pres_Dose.append('/' + str(self.fractions) + 'Fxs/')
+                VOI_OptMethod.append(self.OptMethod)
+                VOI_ionType.append(self.ionType)
             VOI_Parameter.append('mean')
             for n in self.Dcc:
                 VOI_Parameter.append('D' + str(n) + 'cc')
         # start get dose DVH info.
-        return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter
+        return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType
 
-    def AnalyzeDVHvoidata(self, fileToanalysis, Definednameofdata,
-                          referencedata):  # return write data: vol, pdose, parameter.
+    def AnalyzeDVHvoidata(self, fileToanalysis, Definednameofdata,referencedata):  # return write data: vol, pdose, parameter.
         # start get dose DVH info.
         VOI_data = []
         voidata_worst = ['Worst_' + Definednameofdata]
@@ -347,6 +363,7 @@ class class_analysis_gd:
                 floatvoidata = []
                 for j in range(startaveragepoint, len(VOI_data)):
                     floatvoidata.append(float(VOI_data[j][i]))
+                #floatvoidata_neg=[i for i in floatvoidata if float(i)<0]
                 voidata_np = np.array(floatvoidata)
                 voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
                 voidata_mean.append(np.mean(voidata_np))
@@ -357,7 +374,140 @@ class class_analysis_gd:
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
         return VOI_data
+    def AnalyzeDVHvoidata_abs(self, fileToanalysis, Definednameofdata,referencedata):  # return write data: vol, pdose, parameter.
+        # start get dose DVH info.
+        VOI_data = []
+        voidata_worst = ['Worst_' + Definednameofdata]
+        voidata_mean = ['Mean_' + Definednameofdata]
+        voidata_median = ['Median_' + Definednameofdata]
+        voidata_SD = ['SD_' + Definednameofdata]
+        ContainsReference = False
+        startaveragepoint = 0
+        if referencedata:
+            ContainsReference = True
+            startaveragepoint = 1
 
+        for filesuffex in self.robust_suffix:
+            gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
+            VOI_data.append([Definednameofdata + filesuffex + '%'])  # add first row(name). for reference colume, it will change acorrodingly.
+            countRefereindex = 0
+            for targetinfo in range(0, len(self.targetnamelist)):
+                targetName = self.targetnamelist[targetinfo]
+                targetDose = self.targetdoselist[targetinfo]
+
+                # prepareing data for calcuation of CI
+                self.lowerdoseforext = float(targetDose)
+                self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
+
+                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
+                    gdfilestoanalysis, targetName,
+                    'Target', float(targetDose),
+                    self.Vxx, self.Dxx,
+                    self.Dcc)
+                if ContainsReference:
+                    VOI_data[-1][0] = Definednameofdata + filesuffex  # modify the first row(name)
+                    pass
+                else:
+                    Dmin = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], Dmin)
+                    countRefereindex += 1
+                    Dmax = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], Dmax)
+                    countRefereindex += 1
+                    Dmean = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], Dmean)
+                    countRefereindex += 1
+                    CI = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], CI)
+                    countRefereindex += 1
+                    HI = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], HI)
+                    countRefereindex += 1
+                    for vxxno in range(0, len(Vxxlist)):
+                        if Vxxlist[vxxno] == -1:
+                            print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate')
+                        Vxxlist[vxxno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
+                                                                   Vxxlist[vxxno])*self.referenceDATAforCompare[countRefereindex]/100
+                        countRefereindex += 1
+                    for Dxxno in range(0, len(Dxxlist)):
+                        if Dxxlist[Dxxno] == -1:
+                            print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate')
+                        Dxxlist[Dxxno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
+                                                                   Dxxlist[Dxxno])*self.referenceDATAforCompare[countRefereindex]/100
+                        countRefereindex += 1
+                    for Dccno in range(0, len(Dcclist)):
+                        if Dcclist[Dccno] == -1:
+                            print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate')
+                        Dcclist[Dccno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
+                                                                  Dcclist[Dccno])*self.referenceDATAforCompare[countRefereindex]/100
+                        countRefereindex += 1
+
+                VOI_data[-1].append(str('%.4f' % Dmin))
+                VOI_data[-1].append(str('%.4f' % Dmax))
+                VOI_data[-1].append(str('%.4f' % Dmean))
+                VOI_data[-1].append(str('%.4f' % CI))
+                VOI_data[-1].append(str('%.4f' % HI))
+                for Vxxinfo in Vxxlist:
+                    VOI_data[-1].append(str('%.4f' % Vxxinfo))
+                for Dxxinfo in Dxxlist:
+                    VOI_data[-1].append(str('%.4f' % Dxxinfo))
+                for Dccinfo in Dcclist:
+                    VOI_data[-1].append(str('%.4f' % Dccinfo))
+
+                if ContainsReference:
+                    self.referenceDATAforCompare.append(Dmin)
+                    self.referenceDATAforCompare.append(Dmax)
+                    self.referenceDATAforCompare.append(Dmean)
+                    self.referenceDATAforCompare.append(CI)
+                    self.referenceDATAforCompare.append(HI)
+                    for Vxxinfo in Vxxlist:
+                        self.referenceDATAforCompare.append(Vxxinfo)
+                    for Dxxinfo in Dxxlist:
+                        self.referenceDATAforCompare.append(Dxxinfo)
+                    for Dccinfo in Dcclist:
+                        self.referenceDATAforCompare.append(Dccinfo)
+
+
+            for oarinfo in self.oarnamelist:
+                targetDose = max(self.targetdoselist)
+                Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
+                    gdfilestoanalysis,
+                    oarinfo, 'OAR',
+                    float(targetDose),
+                    self.Vxx, self.Dxx,
+                    self.Dcc)
+                if ContainsReference:
+                    pass
+                else:
+                    Dmean = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], Dmean)
+                    countRefereindex += 1
+                    for Dccno in range(0, len(Dcclist)):
+                        Dcclist[Dccno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
+                                                                   Dcclist[Dccno])
+                        countRefereindex += 1
+
+                VOI_data[-1].append(str('%.4f' % Dmean))
+                for Dccinfo in Dcclist:
+                    VOI_data[-1].append(str('%.4f' % Dccinfo))
+
+                if ContainsReference:
+                    self.referenceDATAforCompare.append(Dmean)
+                    for Dccinfo in Dcclist:
+                        self.referenceDATAforCompare.append(Dccinfo)
+                    # reference data start average from voidata 1. skip the reference.
+
+            ContainsReference = False
+        if self.robusteva:
+            for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
+                floatvoidata = []
+                for j in range(startaveragepoint, len(VOI_data)):
+                    floatvoidata.append(float(VOI_data[j][i]))
+                #floatvoidata_neg=[i for i in floatvoidata if float(i)<0]
+                voidata_np = np.array(floatvoidata)
+                voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+                voidata_mean.append(np.mean(voidata_np))
+                voidata_median.append(np.median(voidata_np))
+                voidata_SD.append(np.std(voidata_np))
+            VOI_data.append(voidata_worst)
+            VOI_data.append(voidata_mean)
+            VOI_data.append(voidata_median)
+            VOI_data.append(voidata_SD)
+        return VOI_data
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
 
         if voidose != self.PlanDose:
@@ -723,3 +873,9 @@ class class_analysis_gd:
             return (float(com) - float(ref)) / float(ref)
         else:
             return 9999
+    def fun_calculateDev_abs(self, ref, com):  #
+        if float(ref) != 0:
+            return float(com)/float(ref)
+        else:
+            return 9999
+
