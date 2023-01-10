@@ -243,6 +243,8 @@ class class_analysis_gd:
         # start get dose DVH info.
         return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType
 
+    # this function is not necessary to be used.
+    # If still necessary, copy from AnalyzeDVHvoidata_abs and modify from there. It contains some new information.
     def AnalyzeDVHvoidata(self, fileToanalysis, Definednameofdata,referencedata):  # return write data: vol, pdose, parameter.
         # start get dose DVH info.
         VOI_data = []
@@ -468,11 +470,7 @@ class class_analysis_gd:
             for oarinfo in self.oarnamelist:
                 targetDose = max(self.targetdoselist)
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
-                    gdfilestoanalysis,
-                    oarinfo, 'OAR',
-                    float(targetDose),
-                    self.Vxx, self.Dxx,
-                    self.Dcc)
+                    gdfilestoanalysis,oarinfo, 'OAR',float(targetDose),self.Vxx, self.Dxx,self.Dcc)
                 if ContainsReference:
                     pass
                 else:
@@ -495,13 +493,22 @@ class class_analysis_gd:
 
             ContainsReference = False
         if self.robusteva:
+            collectedparameters=self.fun_parameterstobeanalysised()
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
+                countofcollecteddata=0
                 floatvoidata = []
                 for j in range(startaveragepoint, len(VOI_data)):
                     floatvoidata.append(float(VOI_data[j][i]))
                 #floatvoidata_neg=[i for i in floatvoidata if float(i)<0]
                 voidata_np = np.array(floatvoidata)
-                voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+
+                if collectedparameters[countofcollecteddata]==0:
+                    #voidata_worst.append(related_funs.lambda_abs_max(voidata_np, 0, np.abs))
+                    voidata_worst.append(np.min(voidata_np))
+                elif collectedparameters[countofcollecteddata]==1:
+                    voidata_worst.append(np.max(voidata_np))
+                countofcollecteddata += 1
+
                 voidata_mean.append(np.mean(voidata_np))
                 voidata_median.append(np.median(voidata_np))
                 voidata_SD.append(np.std(voidata_np))
@@ -875,9 +882,40 @@ class class_analysis_gd:
             return (float(com) - float(ref)) / float(ref)
         else:
             return 9999
-    def fun_calculateDev_abs(self, ref, com):  #
+    def fun_calculateDev_abs(self, ref, com):  # consider reference as 100%. return 100*A/ref
         if float(ref) != 0:
-            return float(com)/float(ref)
+            return 100*float(com)/float(ref)
         else:
             return 9999
+
+    # according to target and oar and Vxx, Dxx, Dcc. return 1 and 0 matrix,
+    # 1 means max is worst, 0 means min is the worst.
+    def fun_parameterstobeanalysised(self):
+        whoistheworst=[]
+        for targetinfo in range(0, len(self.targetnamelist)):
+            # one target: Min, Max, Mean, CI, HI,
+            whoistheworst.append(0)
+            whoistheworst.append(1)
+            whoistheworst.append(0)
+            whoistheworst.append(1)
+            whoistheworst.append(1)
+            for Vxxinfo in self.Vxx:
+                if float(Vxxinfo)<=100:
+                    whoistheworst.append(0)
+                else:
+                    whoistheworst.append(1)
+            for Dxxinfo in self.Dxx:
+                if float(Dxxinfo)>=50:
+                    whoistheworst.append(0)
+                else:
+                    whoistheworst.append(1)
+            for Dccinfo in self.Dcc: # D1cc max is the worst
+                whoistheworst.append(1)
+        for oarinfo in range(0, len(self.oarnamelist)):
+            # for oar mean
+            whoistheworst.append(0)
+            for Dccinfo in self.Dcc:  # D1cc max is the worst
+                whoistheworst.append(1)
+        return whoistheworst
+
 

@@ -1,5 +1,4 @@
-planname='lan'
-if 'p' in planname or 'P' in planname:
-    print('find')
-else:
-    print('none')
+import numpy as np
+voidata_np=np.arange(1,10)
+print(voidata_np)
+print(np.max(voidata_np))
