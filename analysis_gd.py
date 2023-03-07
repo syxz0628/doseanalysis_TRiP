@@ -72,7 +72,7 @@ class class_analysis_gd:
         # dose_shown_in_gd is the dose written in the exec file, for SPHIC momi cases this value was set to 3 for all plans.
         self.PlanDose = dose_shown_in_gd
         if len(self.nameofgdlist) != len(self.FileList):
-            errormess = 'Detects wrong input:"gdlist path and name is not the same length, please check"'
+            errormess = 'Detects wrong input:"gdlist path and given described names are not the same, please check"'
             related_funs.writelog(self.path2log, errormess)
             sys.exit()
         related_funs.writelog(self.path2log, 'Start a new analysis')
@@ -88,7 +88,7 @@ class class_analysis_gd:
             # do not change order VOI_data first. so self.reference could be available.
             VOI_data = self.AnalyzeDVHvoidata_abs(fileToanalysis, Definednameofdata, referencedata)
 
-            if referencedata: # write some pre information.
+            if referencedata: # write some pre information and analysis reference data.
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
                 #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
                 patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType\
@@ -101,10 +101,10 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_Parameter)
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
+                # todo: analysis reference data.
                 referencedata = False
-
-
-            self.fun_append_listonebyone(self.writelinesinfo, VOI_data)
+            # add voi_data to list writelinesinfo one by one
+            [self.writelinesinfo.append(i) for i in VOI_data]
 
             # write gamma data to line
             # gammacri = []
@@ -661,15 +661,17 @@ class class_analysis_gd:
         return (xvalues, yvalues)
 
     def Dmin(self, VOIstr, filename):
+        mindose=9999
         with open(filename, 'r') as fin:
             for line in fin:
                 b = line.split()
                 if line.startswith("c: " + VOIstr) and b[1] == VOIstr:
-                    maxdose = float(line.split()[2])
-            result = maxdose
+                    mindose = float(line.split()[2])
+            result = mindose
         return result
 
     def Dmax(self, VOIstr, filename):
+        maxdose=9999
         with open(filename, 'r') as fin:
             for line in fin:
                 b = line.split()
@@ -679,6 +681,7 @@ class class_analysis_gd:
         return result
 
     def Dmean(self, VOIstr, path):
+        meandose=9999
         with open(path, 'r') as fin:
             for line in fin:
                 b = line.split()
@@ -871,11 +874,6 @@ class class_analysis_gd:
                                                               interfra=5, maxgamma=1.1, fraction=1, saveresults='False',
                                                               pronecase=False, moreinfo=False)
         return gammalist
-
-    def fun_append_listonebyone(self, write2list, datalist):
-        for list2write in datalist:
-            write2list.append(list2write)
-        return write2list
 
     def fun_calculateDevPerc(self, ref, com):  #
         if float(ref) != 0:
