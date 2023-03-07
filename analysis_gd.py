@@ -192,7 +192,7 @@ class class_analysis_gd:
             dIrrVolcc = -1
             dIrrVolcc = self.getIrrVolByVOI(fileToanalysis + self.robust_suffix[0] + '.dvh.gd',
                                             targetName) / 1000  # mm^3 --> cc
-            if dIrrVolcc <= 0.0 and not any(c in targetName for c in 'POZ'):
+            if dIrrVolcc <= 0.0 and not any(c in targetName for c in 'POZM'):
                 writeinfo = "Voi " + targetName + " doesn't exist for file: "+fileToanalysis
                 related_funs.writelog(self.path2log, writeinfo)
 
@@ -287,21 +287,21 @@ class class_analysis_gd:
                     HI = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex], HI)
                     countRefereindex += 1
                     for vxxno in range(0, len(Vxxlist)):
-                        if Vxxlist[vxxno] == -1 and not any(c in targetName for c in 'POZ') :
+                        if Vxxlist[vxxno] == -1 and not any(c in targetName for c in 'POZM') :
                             print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Vxxlist[vxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
                                                                    Vxxlist[vxxno])*self.referenceDATAforCompare[countRefereindex]/100
                         countRefereindex += 1
                     for Dxxno in range(0, len(Dxxlist)):
-                        if Dxxlist[Dxxno] == -1 and not any(c in targetName for c in 'POZ'):
+                        if Dxxlist[Dxxno] == -1 and not any(c in targetName for c in 'POZM'):
                             print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Dxxlist[Dxxno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
                                                                    Dxxlist[Dxxno])*self.referenceDATAforCompare[countRefereindex]/100
                         countRefereindex += 1
                     for Dccno in range(0, len(Dcclist)):
-                        if Dcclist[Dccno] == -1 and not any(c in targetName for c in 'POZ'):
+                        if Dcclist[Dccno] == -1 and not any(c in targetName for c in 'POZM'):
                             print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Dcclist[Dccno] = self.fun_calculateDevPerc(self.referenceDATAforCompare[countRefereindex],
@@ -424,21 +424,21 @@ class class_analysis_gd:
                     HI = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex], HI)
                     countRefereindex += 1
                     for vxxno in range(0, len(Vxxlist)):
-                        if Vxxlist[vxxno] == -1 and not any(c in targetName for c in 'POZ'):
+                        if Vxxlist[vxxno] == -1 and not any(c in targetName for c in 'POZM'):
                             print('V', self.Vxx[vxxno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Vxxlist[vxxno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
                                                                    Vxxlist[vxxno])*self.referenceDATAforCompare[countRefereindex]/100
                         countRefereindex += 1
                     for Dxxno in range(0, len(Dxxlist)):
-                        if Dxxlist[Dxxno] == -1 and not any(c in targetName for c in 'POZ'):
+                        if Dxxlist[Dxxno] == -1 and not any(c in targetName for c in 'POZM'):
                             print('V', self.Dxx[Dxxno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Dxxlist[Dxxno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
                                                                    Dxxlist[Dxxno])*self.referenceDATAforCompare[countRefereindex]/100
                         countRefereindex += 1
                     for Dccno in range(0, len(Dcclist)):
-                        if Dcclist[Dccno] == -1 and not any(c in targetName for c in 'POZ'):
+                        if Dcclist[Dccno] == -1 and not any(c in targetName for c in 'POZM'):
                             print('V', self.Dcc[Dccno], ' of ' + targetName + ' is not possible to calculate for:'
                                   +gdfilestoanalysis)
                         Dcclist[Dccno] = self.fun_calculateDev_abs(self.referenceDATAforCompare[countRefereindex],
