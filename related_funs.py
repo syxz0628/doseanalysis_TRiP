@@ -12,7 +12,7 @@ def max_index(lst_int):
 
 def writelog(path2log,writeinfo):
     if path2log != None:
-        print(path2log,' --> ',writeinfo)
+        print('<log> --> ',writeinfo)
         with open(path2log, 'a+') as logfile:
             logfile.writelines(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+os.linesep)
             logfile.writelines(writeinfo+os.linesep)
