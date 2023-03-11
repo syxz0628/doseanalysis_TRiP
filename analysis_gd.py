@@ -315,13 +315,15 @@ class class_analysis_gd:
             VOI_data.append(voidata_mean)
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
-        if self.Showworstonly and referencedata: # if data inculdes reference, return reference and worst
-            VOI_data_temp = []
-            VOI_data_temp.append(VOI_data[0])
-            VOI_data_temp.append(voidata_worst)
-            return VOI_data_temp
-        elif not referencedata:
-            return voidata_worst
+        if self.robusteva and self.Showworstonly:
+            if referencedata:
+            # if data inculdes reference, return reference and worst
+                VOI_data_temp = []
+                VOI_data_temp.append(VOI_data[0])
+                VOI_data_temp.append(voidata_worst)
+                return VOI_data_temp
+            else:
+                return voidata_worst
         else:
             return VOI_data
 
