@@ -86,7 +86,6 @@ class class_analysis_gd:
             Definednameofdata = self.nameofgdlist[fileNo]
             # do not change order VOI_data first. so self.reference could be available.
             VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
-            print(VOI_data)
             if referencedata: # write some pre information and analysis reference data.
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
                 #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
