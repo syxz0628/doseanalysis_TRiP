@@ -16,7 +16,7 @@ if __name__=="__main__":
     parser.add_argument("-d","--targetdoselist", required=True, help="Target dose list") 
     parser.add_argument("-o","--oarnamelist", required=True, help="OAR name list")
     parser.add_argument("-e", "--external", required=True, help="External name")
-    parser.add_argument("-f","--fractions", required=False, help="fractions for this plan",defalut=1.0)
+    parser.add_argument("-f","--fractions", required=False, help="fractions for this plan", default=1.0)
     parser.add_argument("-ga", "--gamma", required=False, action='store_true',help="add gamma analysis to the result",default=False)
     # parser.add_argument("-s","--savename", required=False, help="txt file save to name")
     parser.add_argument("-sp", "--savepath", required=False, help="file path to save logs")
