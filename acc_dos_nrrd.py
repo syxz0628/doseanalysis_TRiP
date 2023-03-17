@@ -52,13 +52,13 @@ class class_analysis_dos_nrrd:
             print('nrrdfile: ',path2dosenrrd,' was modified the space directions')
 
     def fun_genhedchangename(self,writetosenario,onehedfile):
-        with open(writetosenario+'.nhdr') as f:
+        with open(writetosenario+'.nhdr','r') as f:
             lines=f.readlines()
             for jj in range(0,len(lines)):
                 if 'raw' in lines[jj]:
                     lines[jj]=lines[jj].replace('raw','dos')
 
-        with open(writetosenario+'.nhdr') as f:
+        with open(writetosenario+'.nhdr','w+') as f:
             f.writelines(lines)
 
         subprocess.run(['cp', onehedfile, writetosenario+'.hed'])
