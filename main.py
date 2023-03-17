@@ -59,7 +59,7 @@ if __name__=="__main__":
         OptMethod = args.OptMethod
         Planneddose = args.doseshowninplansgd
         Showworstonly = args.showworstonly
-        randomrobust=args.randomrobust
+        randomrobust=args.randomrobustana
 
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
