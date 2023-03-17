@@ -17,7 +17,7 @@ if __name__=="__main__":
     parser.add_argument("-o","--oarnamelist", required=True, help="OAR name list")
     parser.add_argument("-e", "--external", required=True, help="External name")
     parser.add_argument("-f","--fractions", required=False, help="fractions for this plan", default=1.0)
-    parser.add_argument("-ga", "--gamma", required=False, action='store_true',help="add gamma analysis to the result",default=False)
+    parser.add_argument("-ga", "--gamma", required=False, action='store_true',help="add gamma analysis to the result")
     # parser.add_argument("-s","--savename", required=False, help="txt file save to name")
     parser.add_argument("-sp", "--savepath", required=False, help="file path to save logs")
     parser.add_argument("-r", "--robustevaluation", required=False, help="flag if DVH files are robust evaluation files, 21 or 9, Default None")
@@ -29,7 +29,8 @@ if __name__=="__main__":
     parser.add_argument("-dp", "--doseshowninplansgd", required=True, help="dose_shown_in_gd is the dose written in "
                                                                             "the exec file, for SPHIC momi cases this "
                                                                             "value was set to 3 for all plans.", default=3)
-    parser.add_argument("-sw", "--showworstonly", required=False, action='store_true',help="select to show results of only worst cases", default=True)
+    parser.add_argument("-sw", "--showworstonly", required=False, action='store_true',help="select to show results of only worst cases")
+    parser.add_argument("-ac", "--accumulatedose", required=False, help="path of doses nrrds")
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
     #                    default=250)

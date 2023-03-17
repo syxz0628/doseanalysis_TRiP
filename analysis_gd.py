@@ -256,8 +256,7 @@ class class_analysis_gd:
 
         for filesuffex in self.robust_suffix:
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
-            VOI_data.append([
-                                Definednameofdata + filesuffex + '%'])  # add first row(name). for reference colume, it will change acorrodingly.
+            VOI_data.append([Definednameofdata + filesuffex + '%'])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
