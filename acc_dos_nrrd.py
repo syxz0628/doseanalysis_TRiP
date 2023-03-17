@@ -60,7 +60,7 @@ class class_analysis_dos_nrrd:
                 lines[jj] = lines[jj].replace('raw', 'dos')
         with open(writetosenario+'.nhdr','w+') as f:
             f.writelines(lines)
-
         subprocess.run(['cp', onehedfile, writetosenario+'.hed'])
+        subprocess.run(['mv', writetosenario + '.raw.gz', writetosenario + '.dos.gz'])
 
 
