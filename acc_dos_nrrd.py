@@ -26,4 +26,21 @@ class class_analysis_dos_nrrd:
         print(self.path2doselist[-1])
         print("finished writing of: ",self.path2doselist[-1][self.path2doselist[-1].rfind('/')+1:])
 
+    def fun_modifynrrdhed(self,path2dosenrrd):
+        findwrongspace=False
+        with open(path2dosenrrd,'rb') as f:
+            savelines =''
+            for lines in f.readlines():
+                if ('space directions' in lines):
+                    if (', ' in lines or ' ,' in lines):
+                        findwrongspace=True
+                        mod_line=lines.replace(', ',',')
+                        mod_line=mod_line.replace(' ,',',')
+                else:
+                    mod_line=lines
+                savelines+=mod_line+'\n'
+        if findwrongspace:
+            with open(path2dosenrrd,'wb') as f:
+                f.writelines(savelines)
+
 
