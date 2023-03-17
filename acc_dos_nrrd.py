@@ -58,7 +58,7 @@ class class_analysis_dos_nrrd:
         for jj in range(0, len(lines)):
             if 'raw' in lines[jj]:
                 lines[jj] = lines[jj].replace('raw', 'dos')
-        with open(writetosenario+'.nhdr2','w+') as f:
+        with open(writetosenario+'.nhdr','w+') as f:
             f.writelines(lines)
 
         subprocess.run(['cp', onehedfile, writetosenario+'.hed'])
