@@ -39,7 +39,7 @@ class class_analysis_dos_nrrd:
                         mod_line=mod_line.replace(' ,',',')
                 else:
                     mod_line=lines
-                savelines+=mod_line+'\n'
+                savelines+=mod_line
         if findwrongspace:
             with open(path2dosenrrd,'w+') as f:
                 f.writelines(savelines)
