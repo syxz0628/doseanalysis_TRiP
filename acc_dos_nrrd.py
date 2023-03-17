@@ -39,6 +39,7 @@ class class_analysis_dos_nrrd:
                         mod_line=lines.replace(', ',',')
                         mod_line=mod_line.replace(' ,',',')
                 if lines!='\n':
+                    findwrongspace = True
                     mod_line=lines
                 savelines+=mod_line
         if findwrongspace:
