@@ -313,9 +313,8 @@ class class_analysis_gd:
         if referencedata:
             ContainsReference = True
             startaveragepoint = 1
-
-
         for filesuffex in self.filesuffixtoattach:
+            print('<info>Starting new evaluation for: '+fileToanalysis+filesuffex)
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
             VOI_data.append([Definednameofdata + filesuffex + '%'])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
