@@ -20,7 +20,7 @@ class class_analysis_dos_nrrd:
             sys.exit()
         datafile1, headfile1 = nrrd.read(self.path2doselist[0])
         for jj in range(1,len(self.path2doselist)-1):
-            print(self.path2doslist[jj])
+            print(self.path2doselist[jj])
             datafile, headfile = nrrd.read(self.path2doselist[jj])
             datafile1 += datafile
         # nrrd.write(self.path2doselist[-1]+'.nhdr', datafile1, headfile1)
