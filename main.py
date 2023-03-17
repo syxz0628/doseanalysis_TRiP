@@ -67,8 +67,6 @@ if __name__=="__main__":
                                                        randomrobust)
         if referenceSpecial:
             analysis_gd_data.fun_analysis_refonly()
-        elif randomrobust!=None:
-            analysis_gd_data.fun_analysis_random_senerio()
         else:
             analysis_gd_data.fun_analysis_gd()
 
