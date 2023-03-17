@@ -18,13 +18,14 @@ class class_analysis_dos_nrrd:
             errormess = 'Detects wrong input:"dose list at least three"'
             related_funs.writelog(self.path2log, errormess)
             sys.exit()
-        datafile1, headfile1 = nrrd.read(self.path2doselist[1])
+        datafile1, headfile1 = nrrd.read(self.path2doselist[0])
         for jj in range(1,len(self.path2doselist)-1):
+            print(self.path2doslist[jj])
             datafile, headfile = nrrd.read(self.path2doselist[jj])
             datafile1 += datafile
         # nrrd.write(self.path2doselist[-1]+'.nhdr', datafile1, headfile1)
         nrrd.write(self.path2doselist[-1]+'.nhdr', datafile1, headfile1,detached_header=True)
-        print(self.path2doselist[-1])
+
         print("finished writing of: ",self.path2doselist[-1][self.path2doselist[-1].rfind('/')+1:])
 
     def fun_modifynrrdhed(self,path2dosenrrd):
