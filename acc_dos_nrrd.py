@@ -43,5 +43,6 @@ class class_analysis_dos_nrrd:
         if findwrongspace:
             with open(path2dosenrrd,'w+') as f:
                 f.writelines(savelines)
+            print('nrrdfile: ',path2dosenrrd,' was modified the space directions')
 
 
