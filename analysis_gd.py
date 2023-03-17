@@ -15,7 +15,7 @@ import gamma
 
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
-                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showworstonly,randomrobust):
+                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -33,7 +33,8 @@ class class_analysis_gd:
         self.gammaEva = gammaEva
         self.robustevaluation = robustevaluation
         self.robusteva = True
-        self.Showworstonly=Showworstonly # true, only show result of worst case.
+        self.Showworstonly=Showall # true, only show result of worst case.
+        self.Showall = Showall  # true, show result of all.
         if self.robustevaluation == '21':
             self.robust_suffix = ['_nom', '_nx', '_ny', '_nz', '_px', '_py', '_pz',
                                   '_hd', '_hd_nx', '_hd_ny', '_hd_nz', '_hd_px', '_hd_py', '_hd_pz',
@@ -374,7 +375,7 @@ class class_analysis_gd:
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
         if self.robusteva or self.randomrobust is not None:
-            if self.Showworstonly:
+            if not self.Showall:
                 if referencedata:
             # if data inculdes reference, return reference and worst
                     VOI_data_temp = []
