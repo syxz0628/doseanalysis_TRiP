@@ -46,7 +46,7 @@ class class_analysis_gd:
         self.randomrobust=randomrobust
         self.senarioname_suffix =[]
         if self.randomrobust!=None:
-            for jj in range(0,int(self.randomrobust)):
+            for jj in range(1,int(self.randomrobust)+1):
                 self.senarioname_suffix.append(str(jj))
         else:
             self.senarioname_suffix=['']

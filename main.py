@@ -30,7 +30,7 @@ if __name__=="__main__":
     parser.add_argument("-dp", "--doseshowninplansgd", required=False, help="dose_shown_in_gd is the dose written in "
                                                                             "the exec file, for SPHIC momi cases this "
                                                                             "value was set to 3 for all plans.", default=3)
-    parser.add_argument("-sw", "--showworstonly", required=False, action='store_true',help="select to show results of only worst cases")
+    parser.add_argument("-sa", "--showallresult", required=False, action='store_true',help="select to show results of only worst cases")
     parser.add_argument("-ac", "--accumulatedose", required=False, help="input path of doses nrrd files and path to new dose file, accumulate doses")
     parser.add_argument("-rr", "--randomrobustana", required=False,help="analysis radnom senerio based DVH, ~50 or more, default None",)
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
@@ -58,12 +58,12 @@ if __name__=="__main__":
         referenceSpecial = args.referenceSpecial
         OptMethod = args.OptMethod
         Planneddose = args.doseshowninplansgd
-        Showworstonly = args.showworstonly
+        Showallresult = args.showallresult
         randomrobust=args.randomrobustana
 
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
-                                                   robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showworstonly,
+                                                   robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showallresult,
                                                        randomrobust)
         if referenceSpecial:
             analysis_gd_data.fun_analysis_refonly()
