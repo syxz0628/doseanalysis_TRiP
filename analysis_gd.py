@@ -116,6 +116,8 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
                 referencedata = False
+
+            print(VOI_data)
             if isinstance(VOI_data[0],list):
                 [self.writelinesinfo.append(i) for i in VOI_data]
             else:
@@ -192,50 +194,6 @@ class class_analysis_gd:
                     savefileinfo.writelines(str(onedata) + ' ')
                 savefileinfo.write('\n')
 
-
-    def fun_analysis_random_senerio(self):
-        if len(self.nameofgdlist) != len(self.FileList):
-            errormess = 'Detects wrong input:"gdlist path and given described names are not the same, please check"'
-            related_funs.writelog(self.path2log, errormess)
-            sys.exit()
-        related_funs.writelog(self.path2log, 'Start a new analysis')
-        savedata_fildname = self.savepath + self.patientID + '_' + self.planname + '_' + \
-                            "_".join(m for m in self.nameofgdlist) + '.txt'
-        # write log
-        writeloginfo = 'running patient: ' + self.patientID + ' plan: ' + self.planname
-        related_funs.writelog(self.path2log, writeloginfo)
-        referencedata = True
-        for fileNo in range(0, len(self.FileList)):
-            fileToanalysis = self.FileList[fileNo]
-            Definednameofdata = self.nameofgdlist[fileNo]
-            # do not change order VOI_data first. so self.reference could be available.
-            VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
-            if referencedata: # write some pre information and analysis reference data.
-                # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
-                #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
-                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType\
-                    = self.WriteDVHPreInfo(fileToanalysis)
-                self.writelinesinfo.append(patientIDToW)
-                self.writelinesinfo.append(plannameToW)
-                self.writelinesinfo.append(VOI_names)
-                self.writelinesinfo.append(VOI_volumes)
-                self.writelinesinfo.append(VOI_pres_Dose)
-                self.writelinesinfo.append(VOI_Parameter)
-                self.writelinesinfo.append(VOI_OptMethod)
-                self.writelinesinfo.append(VOI_ionType)
-                referencedata = False
-            if isinstance(VOI_data[0],list):
-                [self.writelinesinfo.append(i) for i in VOI_data]
-            else:
-                self.writelinesinfo.append(VOI_data)
-            with open(savedata_fildname, 'w+') as savefileinfo:
-                # savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
-                reverseinfo = list(zip(*self.writelinesinfo))
-                # reverseinfo = self.writelinesinfo
-                for oneline in reverseinfo:
-                    for onedata in oneline:
-                        savefileinfo.writelines(str(onedata) + ' ')
-                    savefileinfo.write('\n')
     def WriteDVHPreInfo(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['ID']
