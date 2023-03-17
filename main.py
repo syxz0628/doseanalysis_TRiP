@@ -32,6 +32,7 @@ if __name__=="__main__":
                                                                             "value was set to 3 for all plans.", default=3)
     parser.add_argument("-sw", "--showworstonly", required=False, action='store_true',help="select to show results of only worst cases")
     parser.add_argument("-ac", "--accumulatedose", required=False, help="input path of doses nrrd files and path to new dose file, accumulate doses")
+    parser.add_argument("-rr", "--randomrobustana", required=False,help="analysis radnom senerio based DVH, ~50 or more, default None",)
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
     #                    default=250)
@@ -58,14 +59,19 @@ if __name__=="__main__":
         OptMethod = args.OptMethod
         Planneddose = args.doseshowninplansgd
         Showworstonly = args.showworstonly
+        randomrobust=args.randomrobust
 
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
-                                                   robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showworstonly)
+                                                   robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showworstonly,
+                                                       randomrobust)
         if referenceSpecial:
             analysis_gd_data.fun_analysis_refonly()
+        elif randomrobust!=None:
+            analysis_gd_data.fun_analysis_random_senerio()
         else:
             analysis_gd_data.fun_analysis_gd()
+
 
     if args.accumulatedose!=None:
         path2doslist = args.accumulatedose.split(',')

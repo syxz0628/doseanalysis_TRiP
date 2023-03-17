@@ -15,7 +15,7 @@ import gamma
 
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
-                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showworstonly):
+                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showworstonly,randomrobust):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -42,6 +42,14 @@ class class_analysis_gd:
         else:
             self.robusteva=False
             self.robust_suffix = ['']
+
+        self.randomrobust=randomrobust
+        self.senarioname_suffix =[]
+        if self.randomrobust!=None:
+            for jj in range(0,int(self.randomrobust)):
+                self.senarioname_suffix.append(str(jj))
+        else:
+            self.senarioname_suffix=['']
 
         self.ionType = 'Carbon' # when use this script, please check if your plan name contains P or C that indicates ion type!!!!
         if 'p' in self.planname or 'P' in self.planname:
@@ -175,6 +183,51 @@ class class_analysis_gd:
                 for onedata in oneline:
                     savefileinfo.writelines(str(onedata) + ' ')
                 savefileinfo.write('\n')
+
+
+    def fun_analysis_random_senerio(self):
+        if len(self.nameofgdlist) != len(self.FileList):
+            errormess = 'Detects wrong input:"gdlist path and given described names are not the same, please check"'
+            related_funs.writelog(self.path2log, errormess)
+            sys.exit()
+        related_funs.writelog(self.path2log, 'Start a new analysis')
+        savedata_fildname = self.savepath + self.patientID + '_' + self.planname + '_' + \
+                            "_".join(m for m in self.nameofgdlist) + '.txt'
+        # write log
+        writeloginfo = 'running patient: ' + self.patientID + ' plan: ' + self.planname
+        related_funs.writelog(self.path2log, writeloginfo)
+        referencedata = True
+        for fileNo in range(0, len(self.FileList)):
+            fileToanalysis = self.FileList[fileNo]
+            Definednameofdata = self.nameofgdlist[fileNo]
+            # do not change order VOI_data first. so self.reference could be available.
+            VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
+            if referencedata: # write some pre information and analysis reference data.
+                # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
+                #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
+                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType\
+                    = self.WriteDVHPreInfo(fileToanalysis)
+                self.writelinesinfo.append(patientIDToW)
+                self.writelinesinfo.append(plannameToW)
+                self.writelinesinfo.append(VOI_names)
+                self.writelinesinfo.append(VOI_volumes)
+                self.writelinesinfo.append(VOI_pres_Dose)
+                self.writelinesinfo.append(VOI_Parameter)
+                self.writelinesinfo.append(VOI_OptMethod)
+                self.writelinesinfo.append(VOI_ionType)
+                referencedata = False
+            if isinstance(VOI_data[0],list):
+                [self.writelinesinfo.append(i) for i in VOI_data]
+            else:
+                self.writelinesinfo.append(VOI_data)
+            with open(savedata_fildname, 'w+') as savefileinfo:
+                # savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
+                reverseinfo = list(zip(*self.writelinesinfo))
+                # reverseinfo = self.writelinesinfo
+                for oneline in reverseinfo:
+                    for onedata in oneline:
+                        savefileinfo.writelines(str(onedata) + ' ')
+                    savefileinfo.write('\n')
     def WriteDVHPreInfo(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['ID']
@@ -254,7 +307,12 @@ class class_analysis_gd:
             ContainsReference = True
             startaveragepoint = 1
 
-        for filesuffex in self.robust_suffix:
+        filesuffixtoattach=[]
+        if self.robusteva:
+            filesuffixtoattach=self.robusteva
+        elif self.randomrobust!=None:
+            filesuffixtoattach=self.senarioname_suffix
+        for filesuffex in filesuffixtoattach:
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
             VOI_data.append([Definednameofdata + filesuffex + '%'])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
@@ -292,7 +350,7 @@ class class_analysis_gd:
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             ContainsReference = False
-        if self.robusteva:
+        if self.robusteva or self.randomrobust is not None:
             collectedparameters = self.fun_parameterstobeanalysised()
             countofcollecteddata = 0
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
@@ -313,15 +371,16 @@ class class_analysis_gd:
             VOI_data.append(voidata_mean)
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
-        if self.robusteva and self.Showworstonly:
-            if referencedata:
+        if self.robusteva or self.randomrobust is not None:
+            if self.Showworstonly:
+                if referencedata:
             # if data inculdes reference, return reference and worst
-                VOI_data_temp = []
-                VOI_data_temp.append(VOI_data[0])
-                VOI_data_temp.append(voidata_worst)
-                return VOI_data_temp
-            else:
-                return voidata_worst
+                    VOI_data_temp = []
+                    VOI_data_temp.append(VOI_data[0])
+                    VOI_data_temp.append(voidata_worst)
+                    return VOI_data_temp
+                else:
+                    return voidata_worst
         else:
             return VOI_data
 
