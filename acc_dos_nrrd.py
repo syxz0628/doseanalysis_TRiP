@@ -54,7 +54,10 @@ class class_analysis_dos_nrrd:
     def fun_genhedchangename(self,writetosenario,onehedfile):
         with open(writetosenario+'.nhdr') as f:
             lines=f.readlines()
-            lines=lines.replace('raw','dos')
+            for jj in range(0,len(lines)):
+                if 'raw' in lines[jj]:
+                    lines[jj]=lines[jj].replace('raw','dos')
+
         with open(writetosenario+'.nhdr') as f:
             f.writelines(lines)
 
