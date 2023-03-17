@@ -28,7 +28,8 @@ class class_analysis_dos_nrrd:
         nrrd.write(self.path2doselist[-1]+'.nhdr', datafile1, headfile1,detached_header=True)
 
         print("finished writing of: ",self.path2doselist[-1][self.path2doselist[-1].rfind('/')+1:])
-        onehedfile=self.path2doselist[0][self.path2doselist[0].rfind('/')+1:].replace('.nrrd','hed')
+        onehedfile=self.path2doselist[0][self.path2doselist[0].rfind('/')+1:]
+        onehedfile=onehedfile.replace('.nrrd','.hed')
         self.fun_genhedchangename(self.path2doselist[-1],onehedfile)
     def fun_modifynrrdhed(self,path2dosenrrd):
         findwrongspace=False
