@@ -11,7 +11,7 @@ class class_analysis_dos_nrrd:
     def __init__(self, path2doslist):
         self.path2doselist=path2doslist
         self.path2log='./'
-        [self.fun_modifynrrdhed(nrrdfile) for nrrdfile in self.path2doselist]
+        [self.fun_modifynrrdhed(nrrdfile) for nrrdfile in self.path2doselist[:-1]]
 
     def fun_accumulatedose(self):
         if len(self.path2doselist) < 3:
