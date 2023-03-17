@@ -29,7 +29,7 @@ class class_analysis_dos_nrrd:
 
     def fun_modifynrrdhed(self,path2dosenrrd):
         findwrongspace=False
-        with open(path2dosenrrd,'rb') as f:
+        with open(path2dosenrrd,'r+') as f:
             savelines =''
             for lines in f.readlines():
                 if ('space directions' in lines):
@@ -41,7 +41,7 @@ class class_analysis_dos_nrrd:
                     mod_line=lines
                 savelines+=mod_line+'\n'
         if findwrongspace:
-            with open(path2dosenrrd,'wb') as f:
+            with open(path2dosenrrd,'w+') as f:
                 f.writelines(savelines)
 
 
