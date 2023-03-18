@@ -117,7 +117,6 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_ionType)
                 referencedata = False
 
-            print(VOI_data)
             if isinstance(VOI_data[0],list):
                 [self.writelinesinfo.append(i) for i in VOI_data]
             else:
