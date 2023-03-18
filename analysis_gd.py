@@ -48,7 +48,8 @@ class class_analysis_gd:
         self.randomrobust=randomrobust
         self.senarioname_suffix =[]
         if self.randomrobust!=None:
-            for jj in range(1,int(self.randomrobust)+1):
+            calculatedsenarios=self.randomrobust.split(',')
+            for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
                 self.senarioname_suffix.append(str(jj))
         else:
             self.senarioname_suffix=['']
@@ -164,7 +165,6 @@ class class_analysis_gd:
                     for onedata in oneline:
                         savefileinfo.writelines(str(onedata) + ' ')
                     savefileinfo.write('\n')
-
     def fun_analysis_refonly(self):
         fileNo=0
         fileToanalysis = self.FileList[fileNo]
@@ -192,7 +192,6 @@ class class_analysis_gd:
                 for onedata in oneline:
                     savefileinfo.writelines(str(onedata) + ' ')
                 savefileinfo.write('\n')
-
     def WriteDVHPreInfo(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['ID']
@@ -256,7 +255,6 @@ class class_analysis_gd:
                 VOI_Parameter.append('D' + str(n) + 'cc')
         # start get dose DVH info.
         return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType
-
     def AnalyzeDVHvoidata(self, fileToanalysis, Definednameofdata, referencedata):
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
@@ -342,7 +340,6 @@ class class_analysis_gd:
                 return voidata_worst
         else:
             return VOI_data
-
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
 
         if voidose != self.PlanDose:
@@ -445,7 +442,6 @@ class class_analysis_gd:
             percen = self.fun_Vxx(95, xvalues, yvalues, voiname)
             ExtV95 = percen / 100 * dIrrVolcc  # abs v95%
         return ExtV95
-
     def getDVHValuesFromFileByVOI(self, filename, VOIstr, **kwargs):
         bReadDifferential = kwargs.get("bReadDifferential", False)
         """Read x and y values from GD file for DVH by VOIstr"""
@@ -485,7 +481,6 @@ class class_analysis_gd:
                         yvalues.append(float(values[1]))
 
         return (xvalues, yvalues)
-
     def Dmin(self, VOIstr, filename):
         mindose=9999
         with open(filename, 'r') as fin:

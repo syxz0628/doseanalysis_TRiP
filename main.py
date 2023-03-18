@@ -71,7 +71,7 @@ if __name__=="__main__":
             analysis_gd_data.fun_analysis_gd()
 
 
-    if args.accumulatedose!=None:
+    if args.path2gdlist==None and args.accumulatedose!=None:
         path2doslist = args.accumulatedose.split(',')
         analysis_dos_data=acc_dos_nrrd.class_analysis_dos_nrrd(path2doslist)
         analysis_dos_data.fun_accumulatedose()
