@@ -19,6 +19,7 @@ class class_analysis_dos_nrrd:
             errormess = 'Detects wrong input:"dose list at least three"'
             related_funs.writelog(self.path2log, errormess)
             sys.exit()
+        print(self.path2doselist[0])
         datafile1, headfile1 = nrrd.read(self.path2doselist[0])
         for jj in range(1,len(self.path2doselist)-1):
             print(self.path2doselist[jj])
