@@ -287,7 +287,7 @@ class class_analysis_gd:
         for filesuffex in self.filesuffixtoattach:
             print('<info> --> Starting evaluation: '+fileToanalysis+filesuffex)
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
-            VOI_data.append([Defineddatanameprefix + filesuffex ])  # add first row(name). for reference colume, it will change acorrodingly.
+            VOI_data.append([Defineddatanameprefix + filesuffex[-3:] ])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
 
             if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
