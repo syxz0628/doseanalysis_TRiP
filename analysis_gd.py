@@ -28,7 +28,7 @@ class class_analysis_gd:
         self.lowerdoseforext = 999  # take lower
         # prescribed dose for calculate of V95 for Ext
         self.ExtV95 = 0
-        self.fractions = fractions
+        self.fractions = fractions # fractions to calculate doses
         self.savepath = savepath
         self.gammaEva = gammaEva
         self.robustevaluation = robustevaluation
@@ -47,15 +47,16 @@ class class_analysis_gd:
         self.randomrobust=randomrobust
         self.fractionsacc=fractionsacc
         self.senarioname_suffix =[]
-        if self.randomrobust is not None and not self.fractionsacc: #either senario or fxacc. they should be evaluate separately
+        if self.randomrobust is not None and self.fractionsacc is None: #either senario or fxacc. they should be evaluate separately
             calculatedsenarios=self.randomrobust.split(',')
             for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
                 self.senarioname_suffix.append(str(jj))
-        elif self.randomrobust is not None and self.fractionsacc:
+        elif self.randomrobust is not None and self.fractionsacc is not None:
             calculatedsenarios = self.randomrobust.split(',')
             for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
-                for kk in range(1,int(self.fractions)+1):
-                    self.senarioname_suffix.append(str(jj)+'_fxDVH'+'1-'+str(kk))
+                for kk in range(1,int(self.fractionsacc)+1):
+                    surffixtemp=str(jj)+'_fxDVH'+'1-'+str(kk)
+                    self.senarioname_suffix.append(surffixtemp)
         else:
             self.senarioname_suffix=['']
 
@@ -282,6 +283,11 @@ class class_analysis_gd:
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
                 targetDose = self.targetdoselist[targetinfo]
+                if self.fractionsacc is not None: # calculate target dose for each fraction acc.
+                    fxacc_fileindex=filesuffex[filesuffex.rfind('-')+1:]
+                    fxacc_fractiondose=float(targetDose)/float(self.fractionsacc)
+                    targetDose = float(fxacc_fileindex)*fxacc_fractiondose
+
                 # prepareing data for calcuation of CI
                 self.lowerdoseforext = float(targetDose)
                 self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
@@ -307,13 +313,19 @@ class class_analysis_gd:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             for oarinfo in self.oarnamelist:
                 targetDose = max(self.targetdoselist)
+
+                if self.fractionsacc is not None: # calculate target dose for each fraction acc.
+                    fxacc_fileindex=filesuffex[filesuffex.rfind('-')+1:]
+                    fxacc_fractiondose=float(targetDose)/float(self.fractionsacc)
+                    targetDose = float(fxacc_fileindex)*fxacc_fractiondose
+
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
                     gdfilestoanalysis, oarinfo, 'OAR', float(targetDose), self.Vxx, self.Dxx, self.Dcc)
                 VOI_data[-1].append(str('%.4f' % Dmean))
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             ContainsReference = False
-        if self.robusteva or (self.randomrobust is not None and not self.fractionsacc):
+        if self.robusteva or (self.randomrobust is not None and self.fractionsacc is None):
             collectedparameters = self.fun_parameterstobeanalysised()
             countofcollecteddata = 0
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
@@ -334,7 +346,7 @@ class class_analysis_gd:
             VOI_data.append(voidata_mean)
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
-        if (self.robusteva or (self.randomrobust is not None and not self.fractionsacc)) and not self.Showall:
+        if (self.robusteva or (self.randomrobust is not None and self.fractionsacc is None)) and not self.Showall:
             if referencedata:
         # if data inculdes reference, return reference and worst
                 VOI_data_temp = []

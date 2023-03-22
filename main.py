@@ -33,7 +33,7 @@ if __name__=="__main__":
     parser.add_argument("-sa", "--showallresult", required=False, action='store_true',help="select to show results of only worst cases")
     parser.add_argument("-ac", "--accumulatedose", required=False, help="input path of doses nrrd files and path to new dose file, accumulate doses")
     parser.add_argument("-rr", "--randomrobustana", required=False,help="analysis radnom senerio based DVH, 1,30 or more, default None")
-    parser.add_argument("-fa", "--fxacc", required=False,action='store_true',
+    parser.add_argument("-fa", "--fxacc", required=False,
                         help="analysis radnom senerio based DVH, accumulate each 1-N fractions, default False", )
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
@@ -62,7 +62,7 @@ if __name__=="__main__":
         Planneddose = args.doseshowninplansgd
         Showallresult = args.showallresult
         randomrobust=args.randomrobustana # 1,30
-        fractionsacc =args.fxacc
+        fractionsacc =args.fxacc # 5,10,20,23
 
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
