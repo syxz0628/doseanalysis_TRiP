@@ -35,6 +35,7 @@ if __name__=="__main__":
     parser.add_argument("-rr", "--randomrobustana", required=False,help="analysis radnom senerio based DVH, 1,30 or more, default None")
     parser.add_argument("-fa", "--fxacc", required=False,
                         help="analysis radnom senerio based DVH, accumulate each 1-N fractions, default False", )
+    parser.add_argument("-re", "--referencegd", required=False, help="path to referece gd file")
     #parser.add_argument("-t", "--timeoffset", required=False, type=int, nargs='+',
     #                    help="Time offset in msec,to adjust results in ~250ms level that was added to system determined timeoffset value;multiple values are acceptable, e.g. -t 250 -250 100",
     #                    default=250)
@@ -63,11 +64,12 @@ if __name__=="__main__":
         Showallresult = args.showallresult
         randomrobust=args.randomrobustana # 1,30
         fractionsacc =args.fxacc # 5,10,20,23
+        referecegd=args.referencegd
 
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
                                                    robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showallresult,
-                                                       randomrobust,fractionsacc)
+                                                       randomrobust,fractionsacc,referencegd)
         if referenceSpecial:
             analysis_gd_data.fun_analysis_refonly()
         else:

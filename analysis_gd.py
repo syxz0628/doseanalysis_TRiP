@@ -15,7 +15,8 @@ import gamma
 
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
-                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust,fractionsacc):
+                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust,
+                 fractionsacc,referecegd):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -46,6 +47,7 @@ class class_analysis_gd:
 
         self.randomrobust=randomrobust
         self.fractionsacc=fractionsacc
+
         self.senarioname_suffix =[]
         if self.randomrobust is not None and self.fractionsacc is None: #either senario or fxacc. they should be evaluate separately
             calculatedsenarios=self.randomrobust.split(',')
@@ -92,6 +94,9 @@ class class_analysis_gd:
         self.referenceDATAforCompare = []
         self.writelinesinfo = []
 
+        self.referencegd = referecegd  # reference gd file path
+        self.referenceVoidata=[]
+
     def fun_analysis_gd(self):
         if len(self.nameofgdlist) != len(self.FileList):
             errormess = 'Detects wrong input:"gdlist path and given described names are not the same, please check"'
@@ -113,6 +118,8 @@ class class_analysis_gd:
         writeloginfo = 'running patient: ' + self.patientID + ' plan: ' + self.planname
         related_funs.writelog(self.path2log, writeloginfo)
         referencedata = True
+        if self.referencegd is not None:
+            self.referenceVoidata = self.AnalyzeDVHvoirefdata(self.referencegd, '3Dassigned_ref', referencedata)
         for fileNo in range(0, len(self.FileList)):
             fileToanalysis = self.FileList[fileNo]
             Definednameofdata = self.nameofgdlist[fileNo]
@@ -131,6 +138,7 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_Parameter)
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
+                self.writelinesinfo.append(self.referenceVoidata)
                 referencedata = False
 
             if isinstance(VOI_data[0],list):
@@ -362,7 +370,47 @@ class class_analysis_gd:
                 return voidata_worst
         else:
             return VOI_data
+    def AnalyzeDVHvoirefdata(self, fileToanalysis, Defineddatanameprefix, referencedata):
+        # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
+        # return write data: vol, pdose, parameter.
+        # start get dose DVH info.
+        VOI_data = []
+        print('<info> --> Starting evaluation: '+fileToanalysis)
+        gdfilestoanalysis = fileToanalysis + '.dvh.gd'
+        VOI_data.append([Defineddatanameprefix])  # add first row(name). for reference colume, it will change acorrodingly.
+        for targetinfo in range(0, len(self.targetnamelist)):
+            targetName = self.targetnamelist[targetinfo]
+            targetDose = self.targetdoselist[targetinfo]
+            if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
+                self.fractions = float(self.fractionsacc)
+                # prepareing data for calcuation of CI
+            self.lowerdoseforext = float(targetDose)
+            self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
+            Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
+                    gdfilestoanalysis, targetName,
+                    'Target', float(targetDose),
+                    self.Vxx, self.Dxx,
+                    self.Dcc)
+            VOI_data[-1].append(str('%.4f' % Dmin))
+            VOI_data[-1].append(str('%.4f' % Dmax))
+            VOI_data[-1].append(str('%.4f' % Dmean))
+            VOI_data[-1].append(str('%.4f' % CI))
+            VOI_data[-1].append(str('%.4f' % HI))
+            for Vxxinfo in Vxxlist:
+                VOI_data[-1].append(str('%.4f' % Vxxinfo))
+            for Dxxinfo in Dxxlist:
+                VOI_data[-1].append(str('%.4f' % Dxxinfo))
+            for Dccinfo in Dcclist:
+                VOI_data[-1].append(str('%.4f' % Dccinfo))
+        for oarinfo in self.oarnamelist:
+            targetDose = max(self.targetdoselist)
 
+            Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
+                gdfilestoanalysis, oarinfo, 'OAR', float(targetDose), self.Vxx, self.Dxx, self.Dcc)
+            VOI_data[-1].append(str('%.4f' % Dmean))
+            for Dccinfo in Dcclist:
+                VOI_data[-1].append(str('%.4f' % Dccinfo))
+        return VOI_data
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
 
         if voidose != self.PlanDose:
