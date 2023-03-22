@@ -16,7 +16,7 @@ import gamma
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
                  savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust,
-                 fractionsacc,referecegd):
+                 fractionsacc,referecegd,referencefraction):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -96,6 +96,7 @@ class class_analysis_gd:
 
         self.referencegd = referecegd  # reference gd file path
         self.referenceVoidata=[]
+        self.referencefractiondose=referencefraction
 
     def fun_analysis_gd(self):
         if len(self.nameofgdlist) != len(self.FileList):
@@ -385,7 +386,9 @@ class class_analysis_gd:
             targetName = self.targetnamelist[targetinfo]
             targetDose = self.targetdoselist[targetinfo]
             if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
-                self.fractions = float(self.fractionsacc)
+                self.fractions = float(self.referencefractiondose)
+            elif self.randomrobust is not None:
+                self.fractions = float(self.referencefractiondose)
                 # prepareing data for calcuation of CI
             self.lowerdoseforext = float(targetDose)
             self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
