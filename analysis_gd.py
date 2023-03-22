@@ -15,7 +15,7 @@ import gamma
 
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
-                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust):
+                 savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust,fractionsacc):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -33,7 +33,6 @@ class class_analysis_gd:
         self.gammaEva = gammaEva
         self.robustevaluation = robustevaluation
         self.robusteva = True
-        self.Showworstonly=Showall # true, only show result of worst case.
         self.Showall = Showall  # true, show result of all.
         if self.robustevaluation == '21':
             self.robust_suffix = ['_nom', '_nx', '_ny', '_nz', '_px', '_py', '_pz',
@@ -46,18 +45,24 @@ class class_analysis_gd:
             self.robust_suffix = ['']
 
         self.randomrobust=randomrobust
+        self.fractionsacc=fractionsacc
         self.senarioname_suffix =[]
-        if self.randomrobust!=None:
+        if self.randomrobust is not None and not self.fractionsacc: #either senario or fxacc. they should be evaluate separately
             calculatedsenarios=self.randomrobust.split(',')
             for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
                 self.senarioname_suffix.append(str(jj))
+        elif self.randomrobust is not None and self.fractionsacc:
+            calculatedsenarios = self.randomrobust.split(',')
+            for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
+                for kk in range(1,int(self.fractions)+1):
+                    self.senarioname_suffix.append(str(jj)+'_fxDVH'+str(jj)+'_'+str(kk))
         else:
             self.senarioname_suffix=['']
 
         self.filesuffixtoattach = []
         if self.robusteva:
             self.filesuffixtoattach = self.robusteva
-        elif self.randomrobust != None:
+        elif self.randomrobust is not None:
             self.filesuffixtoattach = self.senarioname_suffix
 
         self.ionType = 'Carbon' # when use this script, please check if your plan name contains P or C that indicates ion type!!!!
@@ -255,15 +260,15 @@ class class_analysis_gd:
                 VOI_Parameter.append('D' + str(n) + 'cc')
         # start get dose DVH info.
         return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType
-    def AnalyzeDVHvoidata(self, fileToanalysis, Definednameofdata, referencedata):
+    def AnalyzeDVHvoidata(self, fileToanalysis, Defineddatanameprefix, referencedata):
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
         # start get dose DVH info.
         VOI_data = []
-        voidata_worst = ['Worst_' + Definednameofdata]
-        voidata_mean = ['Mean_' + Definednameofdata]
-        voidata_median = ['Median_' + Definednameofdata]
-        voidata_SD = ['SD_' + Definednameofdata]
+        voidata_worst = ['Worst_' + Defineddatanameprefix]
+        voidata_mean = ['Mean_' + Defineddatanameprefix]
+        voidata_median = ['Median_' + Defineddatanameprefix]
+        voidata_SD = ['SD_' + Defineddatanameprefix]
         ContainsReference = False
         startaveragepoint = 0
         if referencedata:
@@ -272,7 +277,7 @@ class class_analysis_gd:
         for filesuffex in self.filesuffixtoattach:
             print('<info> --> Starting evaluation: '+fileToanalysis+filesuffex)
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
-            VOI_data.append([Definednameofdata + filesuffex ])  # add first row(name). for reference colume, it will change acorrodingly.
+            VOI_data.append([Defineddatanameprefix + filesuffex ])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
@@ -287,7 +292,7 @@ class class_analysis_gd:
                     self.Vxx, self.Dxx,
                     self.Dcc)
                 if ContainsReference:
-                    VOI_data[-1][0] = Definednameofdata + filesuffex  # modify the first row(name)
+                    VOI_data[-1][0] = Defineddatanameprefix + filesuffex  # modify the first row(name)
                     pass
                 VOI_data[-1].append(str('%.4f' % Dmin))
                 VOI_data[-1].append(str('%.4f' % Dmax))
@@ -308,7 +313,7 @@ class class_analysis_gd:
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             ContainsReference = False
-        if self.robusteva or self.randomrobust is not None:
+        if self.robusteva or (self.randomrobust is not None and not self.fractionsacc):
             collectedparameters = self.fun_parameterstobeanalysised()
             countofcollecteddata = 0
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
@@ -329,7 +334,7 @@ class class_analysis_gd:
             VOI_data.append(voidata_mean)
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
-        if (self.robusteva or self.randomrobust is not None) and not self.Showall:
+        if (self.robusteva or (self.randomrobust is not None and not self.fractionsacc)) and not self.Showall:
             if referencedata:
         # if data inculdes reference, return reference and worst
                 VOI_data_temp = []
@@ -340,6 +345,7 @@ class class_analysis_gd:
                 return voidata_worst
         else:
             return VOI_data
+
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
 
         if voidose != self.PlanDose:
