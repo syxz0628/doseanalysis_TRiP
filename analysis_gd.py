@@ -119,7 +119,7 @@ class class_analysis_gd:
         related_funs.writelog(self.path2log, writeloginfo)
         referencedata = True
         if self.referencegd is not None:
-            self.referenceVoidata = self.AnalyzeDVHvoirefdata(self.referencegd, '3Dassigned_ref', referencedata)
+            self.referenceVoidata = self.AnalyzeDVHvoirefdata(self.referencegd, '3Dassigned_ref')
         for fileNo in range(0, len(self.FileList)):
             fileToanalysis = self.FileList[fileNo]
             Definednameofdata = self.nameofgdlist[fileNo]
@@ -138,7 +138,10 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_Parameter)
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
-                self.writelinesinfo.append(self.referenceVoidata)
+                if isinstance(self.referenceVoidata[0], list):
+                    [self.writelinesinfo.append(i) for i in self.referenceVoidata]
+                else:
+                    self.writelinesinfo.append(self.referenceVoidata)
                 referencedata = False
 
             if isinstance(VOI_data[0],list):
@@ -370,7 +373,7 @@ class class_analysis_gd:
                 return voidata_worst
         else:
             return VOI_data
-    def AnalyzeDVHvoirefdata(self, fileToanalysis, Defineddatanameprefix, referencedata):
+    def AnalyzeDVHvoirefdata(self, fileToanalysis, Defineddatanameprefix):
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
         # start get dose DVH info.
