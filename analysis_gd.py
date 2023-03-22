@@ -98,8 +98,17 @@ class class_analysis_gd:
             related_funs.writelog(self.path2log, errormess)
             sys.exit()
         related_funs.writelog(self.path2log, 'Start a new analysis')
+
+        namesuffix=''
+        if self.fractionsacc is not None:
+            namesuffix='_fxacc'
+        elif self.randomrobust is not None:
+            namesuffix = '_senario'
+        elif self.robusteva:
+            namesuffix = '_worst'
+
         savedata_fildname = self.savepath + self.patientID + '_' + self.planname + '_' + \
-                            "_".join(m for m in self.nameofgdlist) + '.txt'
+                            "_".join(m for m in self.nameofgdlist) + namesuffix+'.txt'
         # write log
         writeloginfo = 'running patient: ' + self.patientID + ' plan: ' + self.planname
         related_funs.writelog(self.path2log, writeloginfo)
