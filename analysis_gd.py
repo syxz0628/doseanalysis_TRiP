@@ -289,13 +289,14 @@ class class_analysis_gd:
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
             VOI_data.append([Defineddatanameprefix + filesuffex ])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
+
+            if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
+                fxacc_fileindex = filesuffex[filesuffex.rfind('-') + 1:]
+                self.fractions = float(self.fractionsacc) / float(fxacc_fileindex)
+
             for targetinfo in range(0, len(self.targetnamelist)):
                 targetName = self.targetnamelist[targetinfo]
                 targetDose = self.targetdoselist[targetinfo]
-                if self.fractionsacc is not None: # calculate target dose for each fraction acc.
-                    fxacc_fileindex=filesuffex[filesuffex.rfind('-')+1:]
-                    fxacc_fractiondose=float(targetDose)/float(self.fractionsacc)
-                    targetDose = float(fxacc_fileindex)*fxacc_fractiondose
 
                 # prepareing data for calcuation of CI
                 self.lowerdoseforext = float(targetDose)
@@ -322,11 +323,6 @@ class class_analysis_gd:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             for oarinfo in self.oarnamelist:
                 targetDose = max(self.targetdoselist)
-
-                if self.fractionsacc is not None: # calculate target dose for each fraction acc.
-                    fxacc_fileindex=filesuffex[filesuffex.rfind('-')+1:]
-                    fxacc_fractiondose=float(targetDose)/float(self.fractionsacc)
-                    targetDose = float(fxacc_fileindex)*fxacc_fractiondose
 
                 Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist = self.getDVHMetricsFromFileByVOI(
                     gdfilestoanalysis, oarinfo, 'OAR', float(targetDose), self.Vxx, self.Dxx, self.Dcc)
