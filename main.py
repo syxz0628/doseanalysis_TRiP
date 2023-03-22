@@ -69,7 +69,7 @@ if __name__=="__main__":
         analysis_gd_data=analysis_gd.class_analysis_gd(patientID,planname,OptMethod,targetnamelist,targetdoselist,
                                                    oarnamelist, externalname,fractions,savepath,gammaEva,
                                                    robustevaluation,path2gdlist,nameofgdlist,Planneddose,Showallresult,
-                                                       randomrobust,fractionsacc,referencegd)
+                                                       randomrobust,fractionsacc,referecegd)
         if referenceSpecial:
             analysis_gd_data.fun_analysis_refonly()
         else:
