@@ -16,7 +16,7 @@ import gamma
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
                  savepath, gammaEva, robustevaluation, path2gdlist, nameofgdlist,doseshowninplansgd,Showall,randomrobust,
-                 fractionsacc,referecegd,referencefraction):
+                 fractionsacc,referecegd,referencefraction,referenceplanneddose):
         self.patientID = patientID
         self.planname = planname
         self.OptMethod= OptMethod
@@ -96,7 +96,8 @@ class class_analysis_gd:
 
         self.referencegd = referecegd  # reference gd file path
         self.referenceVoidata=[]
-        self.referencefractiondose=referencefraction
+        self.referencefraction=referencefraction
+        self.referenceplanneddose=referenceplanneddose
 
     def fun_analysis_gd(self):
         if len(self.nameofgdlist) != len(self.FileList):
@@ -378,17 +379,18 @@ class class_analysis_gd:
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
         # start get dose DVH info.
+        temppd=self.PlanDose
+        tempfractions=self.fractions
+        self.PlanDose=self.referenceplanneddose
+        self.fractions=self.referencefraction
         VOI_data = []
         print('<info> --> Starting evaluation: '+fileToanalysis)
         gdfilestoanalysis = fileToanalysis + '.dvh.gd'
         VOI_data.append([Defineddatanameprefix])  # add first row(name). for reference colume, it will change acorrodingly.
+
         for targetinfo in range(0, len(self.targetnamelist)):
             targetName = self.targetnamelist[targetinfo]
             targetDose = self.targetdoselist[targetinfo]
-            if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
-                self.fractions = float(self.referencefractiondose)
-            elif self.randomrobust is not None:
-                self.fractions = float(self.referencefractiondose)
                 # prepareing data for calcuation of CI
             self.lowerdoseforext = float(targetDose)
             self.ExtV95 = self.getExternalV95(gdfilestoanalysis, self.externalname, 'EXT', self.lowerdoseforext)
@@ -416,6 +418,10 @@ class class_analysis_gd:
             VOI_data[-1].append(str('%.4f' % Dmean))
             for Dccinfo in Dcclist:
                 VOI_data[-1].append(str('%.4f' % Dccinfo))
+
+        self.PlanDose=temppd
+        self.fractions=tempfractions
+
         return VOI_data
     def getDVHMetricsFromFileByVOI(self, filename, voiname, voitype, voidose, voiVxx, voiDxx, voiDcc):
 
