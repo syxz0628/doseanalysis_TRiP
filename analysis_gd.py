@@ -55,7 +55,7 @@ class class_analysis_gd:
             calculatedsenarios = self.randomrobust.split(',')
             for jj in range(int(calculatedsenarios[0]),int(calculatedsenarios[1])+1):
                 for kk in range(1,int(self.fractions)+1):
-                    self.senarioname_suffix.append(str(jj)+'_fxDVH'+str(jj)+'-'+str(kk))
+                    self.senarioname_suffix.append(str(jj)+'_fxDVH'+'1-'+str(kk))
         else:
             self.senarioname_suffix=['']
 
