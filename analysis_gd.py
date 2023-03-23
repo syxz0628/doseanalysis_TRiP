@@ -130,13 +130,15 @@ class class_analysis_gd:
             if referencedata: # write some pre information and analysis reference data.
                 # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
                 #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
-                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType\
-                    = self.WriteDVHPreInfo(fileToanalysis)
+                patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_TargetdoseTec,\
+                    VOI_Parameter,VOI_OptMethod,VOI_ionType = self.WriteDVHPreInfo(fileToanalysis)
                 self.writelinesinfo.append(patientIDToW)
                 self.writelinesinfo.append(plannameToW)
                 self.writelinesinfo.append(VOI_names)
                 self.writelinesinfo.append(VOI_volumes)
                 self.writelinesinfo.append(VOI_pres_Dose)
+                # add SIBH,SIBL,Normal
+                self.writelinesinfo.append(VOI_TargetdoseTec)
                 self.writelinesinfo.append(VOI_Parameter)
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
@@ -228,6 +230,7 @@ class class_analysis_gd:
         VOI_volumes = ['Volume']
         VOI_pres_Dose = ['Dose/Fractions']
         VOI_Parameter = ['parameter']
+        VOI_TargetdoseTec = ['TargetdoseTec'] # SIBL,SIBH,Normal
         VOI_OptMethod = ['OptMethod']
         VOI_ionType=['IonType']
         for targetinfo in range(0, len(self.targetnamelist)):
@@ -246,6 +249,7 @@ class class_analysis_gd:
                 VOI_names.append(self.targetnamelist[targetinfo])
                 VOI_volumes.append(dIrrVolcc)
                 VOI_pres_Dose.append(self.targetdoselist[targetinfo])
+                VOI_TargetdoseTec.append(self.targetdoselist[targetinfo])
                 VOI_OptMethod.append(self.OptMethod)
                 VOI_ionType.append(self.ionType)
 
@@ -276,13 +280,15 @@ class class_analysis_gd:
                 VOI_names.append(oarinfo)
                 VOI_volumes.append(str(dIrrVolcc))
                 VOI_pres_Dose.append('/' + str(self.fractions) + 'Fxs/')
+                VOI_TargetdoseTec.append('/' + str(self.fractions) + 'Fxs/')
                 VOI_OptMethod.append(self.OptMethod)
                 VOI_ionType.append(self.ionType)
             VOI_Parameter.append('mean')
             for n in self.Dcc:
                 VOI_Parameter.append('D' + str(n) + 'cc')
         # start get dose DVH info.
-        return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter,VOI_OptMethod,VOI_ionType
+        return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_TargetdoseTec,\
+            VOI_Parameter,VOI_OptMethod,VOI_ionType
     def AnalyzeDVHvoidata(self, fileToanalysis, Defineddatanameprefix, referencedata):
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
