@@ -249,11 +249,9 @@ class class_analysis_gd:
                 VOI_names.append(self.targetnamelist[targetinfo])
                 VOI_volumes.append(dIrrVolcc)
                 VOI_pres_Dose.append(self.targetdoselist[targetinfo])
-                VOI_TargetdoseTec.append(self.targetdoselist[targetinfo])
+                VOI_TargetdoseTec.append(self.fun_determinTargetDoseTech(targetinfo))
                 VOI_OptMethod.append(self.OptMethod)
                 VOI_ionType.append(self.ionType)
-
-
             VOI_Parameter.append('min')
             VOI_Parameter.append('max')
             VOI_Parameter.append('mean')
@@ -507,6 +505,48 @@ class class_analysis_gd:
             #    Dcclist.append(-1)
         # print(Dcclist)
         return Dmin, Dmax, Dmean, CI, HI, Vxxlist, Dxxlist, Dcclist
+
+    def fun_determinTargetDoseTech(self,targetinfo):
+        # from given target info number and self.targetdoselist, determin target belongs to SIBH, SIBL or Normal
+        NoofdosesinPD=len(set(self.targetdoselist))
+        neckintarget=False
+        for targetname in self.targetnamelist:
+            if 'neck' in targetname:
+                neckintarget=True
+                break
+        if NoofdosesinPD==1: # ctv or gtv case
+            TargetDoseTech='Normal'
+        elif NoofdosesinPD==2: # ctv and gtv case
+            if self.targetdoselist[targetinfo] == max(self.targetdoselist):
+                TargetDoseTech = 'SIBH'
+            else:
+                TargetDoseTech = 'SIBL'
+        elif NoofdosesinPD==3 and not neckintarget: # gboost, gtv, ctv case. ~!neck case not included.
+            if self.targetdoselist[targetinfo] == min(self.targetdoselist):
+                TargetDoseTech = 'SIBL'
+            else:
+                TargetDoseTech = 'SIBH'
+        elif NoofdosesinPD==3 and neckintarget: # gtv, ctv, ctvneck case.
+            if self.targetdoselist[targetinfo] == min(self.targetdoselist):
+                TargetDoseTech = 'Normal'
+            elif self.targetdoselist[targetinfo] == max(self.targetdoselist):
+                TargetDoseTech = 'SIBH'
+            else:
+                TargetDoseTech = 'SIBL'
+        elif NoofdosesinPD==4:
+            non_duplicate_sorted_list = sorted(set(self.targetdoselist))
+            if self.targetdoselist[targetinfo] == max(self.targetdoselist):
+                TargetDoseTech = 'SIBH'
+            elif self.targetdoselist[targetinfo] == min(self.targetdoselist):
+                TargetDoseTech = 'SIBL'
+            elif self.targetdoselist[targetinfo]==non_duplicate_sorted_list[1]:
+                TargetDoseTech = 'SIBL'
+            elif self.targetdoselist[targetinfo]==non_duplicate_sorted_list[2]:
+                TargetDoseTech = 'SIBH'
+        else:
+            TargetDoseTech='9999'
+            print('error in counting the target doses')
+        return TargetDoseTech
 
     def getExternalV95(self, filename, voiname, voitype, voidose):
         # print voiname
