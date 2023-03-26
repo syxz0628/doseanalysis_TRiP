@@ -34,7 +34,7 @@ if __name__=="__main__":
     parser.add_argument("-ac", "--accumulatedose", required=False, help="input path of doses nrrd files and path to new dose file, accumulate doses")
     parser.add_argument("-rr", "--randomrobustana", required=False,help="analysis radnom senerio based DVH, 1,30 or more, default None")
     parser.add_argument("-fa", "--fxacc", required=False,
-                        help="analysis radnom senerio based DVH, accumulate each 1-N fractions, default False", )
+                        help="analysis radnom senerio based DVH, accumulate each 1-N fractions, Default None, give fx value" )
     parser.add_argument("-re", "--referencegd", required=False, help="path to referece gd file")
     parser.add_argument("-rf", "--referencefraction", required=False, help="referece gd file fractions")
     parser.add_argument("-rp", "--referencepd", required=False, help="referece gd file fractions")
