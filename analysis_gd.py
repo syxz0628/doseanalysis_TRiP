@@ -142,10 +142,11 @@ class class_analysis_gd:
                 self.writelinesinfo.append(VOI_Parameter)
                 self.writelinesinfo.append(VOI_OptMethod)
                 self.writelinesinfo.append(VOI_ionType)
-                if isinstance(self.referenceVoidata[0], list):
-                    [self.writelinesinfo.append(i) for i in self.referenceVoidata]
-                else:
-                    self.writelinesinfo.append(self.referenceVoidata)
+                if (len(self.referenceVoidata)!=0):
+                    if isinstance(self.referenceVoidata[0], list):
+                        [self.writelinesinfo.append(i) for i in self.referenceVoidata]
+                    else:
+                        self.writelinesinfo.append(self.referenceVoidata)
                 referencedata = False
 
             if isinstance(VOI_data[0],list):
