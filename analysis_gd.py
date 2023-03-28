@@ -64,7 +64,7 @@ class class_analysis_gd:
 
         self.filesuffixtoattach = []
         if self.robusteva:
-            self.filesuffixtoattach = self.robusteva
+            self.filesuffixtoattach = self.robust_suffix
         elif self.randomrobust is not None:
             self.filesuffixtoattach = self.senarioname_suffix
 
