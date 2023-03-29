@@ -348,7 +348,8 @@ class class_analysis_gd:
                 for Dccinfo in Dcclist:
                     VOI_data[-1].append(str('%.4f' % Dccinfo))
             ContainsReference = False
-        if self.robusteva or (self.randomrobust is not None and self.fractionsacc is None):
+        #if self.robusteva or (self.randomrobust is not None and self.fractionsacc is None):
+        if self.robusteva:
             collectedparameters = self.fun_parameterstobeanalysised()
             countofcollecteddata = 0
             for i in range(1, len(VOI_data[0])):  # calculate worst, mean, median, sd
@@ -369,7 +370,8 @@ class class_analysis_gd:
             VOI_data.append(voidata_mean)
             VOI_data.append(voidata_median)
             VOI_data.append(voidata_SD)
-        if (self.robusteva or (self.randomrobust is not None and self.fractionsacc is None)) and not self.Showall:
+        #if (self.robusteva or (self.randomrobust is not None and self.fractionsacc is None)) and not self.Showall:
+        if self.robusteva and not self.Showall:
             if referencedata:
         # if data inculdes reference, return reference and worst
                 VOI_data_temp = []
