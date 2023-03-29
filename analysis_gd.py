@@ -225,9 +225,9 @@ class class_analysis_gd:
                 savefileinfo.write('\n')
     def WriteDVHPreInfo(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
-        patientIDToW = ['ID']
-        plannameToW = ['Planname']
-        VOI_names = ['OAR/Tname']
+        patientIDToW = ['00_ID']
+        plannameToW = ['00_Planname']
+        VOI_names = ['00_OAR/Tname']
         VOI_volumes = ['Volume']
         VOI_pres_Dose = ['Dose/Fractions']
         VOI_Parameter = ['parameter']
