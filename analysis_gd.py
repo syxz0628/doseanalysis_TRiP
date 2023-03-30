@@ -279,7 +279,7 @@ class class_analysis_gd:
                 VOI_names.append(oarinfo)
                 VOI_volumes.append(str(dIrrVolcc))
                 VOI_pres_Dose.append('/' + str(self.fractions) + 'Fxs/')
-                VOI_TargetdoseTec.append('/' + str(self.fractions) + 'Fxs/')
+                VOI_TargetdoseTec.append(self.fun_determinOarDoseTech())
                 VOI_OptMethod.append(self.OptMethod)
                 VOI_ionType.append(self.ionType)
             VOI_Parameter.append('mean')
@@ -550,7 +550,14 @@ class class_analysis_gd:
             TargetDoseTech='9999'
             print('error in counting the target doses')
         return TargetDoseTech
-
+    def fun_determinOarDoseTech(self):
+        # from given target info number and self.targetdoselist, determin target belongs to SIBH, SIBL or Normal
+        NoofdosesinPD=len(set(self.targetdoselist))
+        if NoofdosesinPD==1:
+            OARDoseTech = 'Normal'
+        else:
+            OARDoseTech = 'SIB'
+        return OARDoseTech
     def getExternalV95(self, filename, voiname, voitype, voidose):
         # print voiname
         if voidose != self.PlanDose:
