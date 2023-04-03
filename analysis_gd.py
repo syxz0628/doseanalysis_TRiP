@@ -272,14 +272,14 @@ class class_analysis_gd:
             if dIrrVolcc <= 0.0:
                 writeinfo = "Voi " + oarinfo + "doesn't exit for file:"+fileToanalysis
                 related_funs.writelog(self.path2log, writeinfo)
-
+            SIBorNorm=self.fun_determinOarDoseTech()
             for i in range(0, len(self.Dcc) + 1):  # dcc mean
                 patientIDToW.append(self.patientID)
                 plannameToW.append(self.planname)
                 VOI_names.append(oarinfo)
                 VOI_volumes.append(str(dIrrVolcc))
                 VOI_pres_Dose.append('/' + str(self.fractions) + 'Fxs/')
-                VOI_TargetdoseTec.append(self.fun_determinOarDoseTech())
+                VOI_TargetdoseTec.append(SIBorNorm)
                 VOI_OptMethod.append(self.OptMethod)
                 VOI_ionType.append(self.ionType)
             VOI_Parameter.append('mean')
