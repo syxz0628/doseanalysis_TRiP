@@ -196,33 +196,6 @@ class class_analysis_gd:
                     for onedata in oneline:
                         savefileinfo.writelines(str(onedata) + ' ')
                     savefileinfo.write('\n')
-    def fun_analysis_refonly(self):
-        fileNo=0
-        fileToanalysis = self.FileList[fileNo]
-        Definednameofdata = self.nameofgdlist[fileNo]
-        referencedata=True
-        VOI_data = self.AnalyzeDVHvoidata(fileToanalysis, Definednameofdata, referencedata)
-
-        # patientIDToW,plannameToW,VOI_names,VOI_volumes,VOI_pres_Dose,VOI_Parameter,VOI_data = \
-        #     self.AnalyzeDVHReference(fileToanalysis, Definednameofdata)
-        patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_Parameter = self.WriteDVHPreInfo(
-            fileToanalysis)
-        self.writelinesinfo.append(patientIDToW)
-        self.writelinesinfo.append(plannameToW)
-        self.writelinesinfo.append(VOI_names)
-        self.writelinesinfo.append(VOI_volumes)
-        self.writelinesinfo.append(VOI_pres_Dose)
-        self.writelinesinfo.append(VOI_Parameter)
-        [self.writelinesinfo.append(i) for i in VOI_data]
-        savedata_fildname = self.savepath +'reference_analysis' + '.tx'
-        with open(savedata_fildname, 'a+') as savefileinfo:
-            # savefileinfo.writelines('patientID plan VOI volume pre_dose parameter 3D 4D1 4D2 4D3 ...')
-            reverseinfo = list(zip(*self.writelinesinfo))
-            # reverseinfo = self.writelinesinfo
-            for oneline in reverseinfo:
-                for onedata in oneline:
-                    savefileinfo.writelines(str(onedata) + ' ')
-                savefileinfo.write('\n')
     def WriteDVHPreInfo(self, fileToanalysis):  # return write data: vol, pdose, parameter.
         # get the voiname, voivolume, voiprescirbeddose, voiparameter info
         patientIDToW = ['00_ID']
@@ -288,6 +261,7 @@ class class_analysis_gd:
         # start get dose DVH info.
         return patientIDToW, plannameToW, VOI_names, VOI_volumes, VOI_pres_Dose, VOI_TargetdoseTec,\
             VOI_Parameter,VOI_OptMethod,VOI_ionType
+
     def AnalyzeDVHvoidata(self, fileToanalysis, Defineddatanameprefix, referencedata):
         # abs means consider Targrt D95 of original plan as 1, calculate percentage different.
         # return write data: vol, pdose, parameter.
@@ -305,10 +279,10 @@ class class_analysis_gd:
         for filesuffex in self.filesuffixtoattach:
             print('<info> --> Starting evaluation: '+fileToanalysis+filesuffex)
             gdfilestoanalysis = fileToanalysis + filesuffex + '.dvh.gd'
-            VOI_data.append([Defineddatanameprefix + filesuffex[-3:] ])  # add first row(name). for reference colume, it will change acorrodingly.
+            VOI_data.append([Defineddatanameprefix + filesuffex])  # add first row(name). for reference colume, it will change acorrodingly.
             countRefereindex = 0
 
-            if self.fractionsacc is not None:  # calculate target dose for each fraction acc.
+            if self.fractionsacc is not None:  # calculate real target dose for each fraction acc. e.g. 70GyE/20fx plan, fx1-2 means pd 7Gy
                 fxacc_fileindex = filesuffex[filesuffex.rfind('-') + 1:]
                 self.fractions = float(self.fractionsacc) / float(fxacc_fileindex)
 
