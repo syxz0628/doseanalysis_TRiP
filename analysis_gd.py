@@ -77,7 +77,7 @@ class class_analysis_gd:
 
         if self.savepath == 'None':
             self.savepath = './'
-        self.Vxx = [90, 95, 100, 105]
+        self.Vxx = [90, 95, 100, 105,107]
         self.Dxx = [2, 95, 98]
         self.Dcc = [1]
         self.path2log = self.savepath + '00_Doseana_processing.log'
