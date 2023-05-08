@@ -574,7 +574,6 @@ class class_analysis_gd:
                 tempy=[]
                 filename=self.FileList[0]+filesuffix+'.dvh.gd'
                 xvaluescom, yvaluescom = self.getDVHValuesFromFileByVOI(filename, targetname)
-                print(filename)
                 tempx,tempy=self.fun_interpletevalues(xvaluescom,yvaluescom,factorcompare,130.1,0.1,'Y'+filesuffix)
                 overallvalues.append(tempy)
             transposed_overallvalues = list(map(list, zip(*overallvalues)))
