@@ -443,7 +443,6 @@ class class_analysis_gd:
         xvalues = np.array(xvalues)
         yvalues = np.array(yvalues)
         xvalues = xvalues * coefficient
-        print(xvalues[-1])
 
         Dmin = self.Dmin(voiname, filename) * float(self.PlanDose) * float(self.fractions)
         Dmean = self.Dmean(voiname, filename) * float(self.PlanDose) * float(self.fractions)
