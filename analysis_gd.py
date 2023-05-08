@@ -553,7 +553,7 @@ class class_analysis_gd:
         dTarget_Fraction_Dose = float(targetmaxdose) / float(self.fractions)
         factorcompare = float(self.PlanDose) / dTarget_Fraction_Dose
         print(factorcompare)
-        
+
         targetandoar=self.targetnamelist+self.oarnamelist
         for targetname in targetandoar:
             overallvalues=[]
@@ -593,10 +593,12 @@ class class_analysis_gd:
         # 使用线性插值创建函数
         # data in xvalues multiply by factorm
         xvalues=np.array(xvalues)
+        yvalues = np.array(yvalues)
         xvalues=xvalues*factorm
         # insert 200 to xvalues to the last
         xvalues=np.append(xvalues,200)
-        yvalues.append(0)
+        yvalues=np.append(yvalues,0)
+        print(xvalues)
         f = interp1d(xvalues, yvalues, kind='linear')
         # 基于xvaluesnew进行插值
         yvaluesnew = f(xvaluesnew)
