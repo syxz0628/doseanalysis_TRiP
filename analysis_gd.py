@@ -11,7 +11,7 @@ import numpy as np
 import sys
 import related_funs
 import gamma
-
+from scipy.interpolate import interp1d
 
 class class_analysis_gd:
     def __init__(self, patientID, planname, OptMethod,targetnamelist, targetdoselist, oarnamelist, externalname, fractions,
@@ -29,7 +29,7 @@ class class_analysis_gd:
         self.lowerdoseforext = 999  # take lower
         # prescribed dose for calculate of V95 for Ext
         self.ExtV95 = 0
-        self.fractions = fractions # fractions to calculate doses
+        self.fractions = fractions # fractions to calculate doses in compared gds
         self.savepath = savepath
         self.gammaEva = gammaEva
         self.robustevaluation = robustevaluation
@@ -80,7 +80,10 @@ class class_analysis_gd:
         self.Vxx = [90, 95, 100, 105,107]
         self.Dxx = [2, 95, 98]
         self.Dcc = [1]
-        self.path2log = self.savepath + '00_Doseana_processing.log'
+        if self.savepath!=None:
+            self.path2log = self.savepath + '00_Doseana_processing.log'
+        else:
+            self.path2log='00_Doseana_processing.log'
         # self.path2log = '/home/yurii/Sheng/patient_data/00_Doseana_processing.log'
 
         self.voilist = []
@@ -532,6 +535,74 @@ class class_analysis_gd:
         else:
             OARDoseTech = 'SIB'
         return OARDoseTech
+    def fun_analysis_export(self,exportpath):
+        print('exporting to '+exportpath)
+        print(self.targetnamelist, self.oarnamelist)
+        print(self.targetdoselist)
+        print(self.PlanDose,self.fractions)        
+        print(self.filesuffixtoattach[0])
+        print(self.filesuffixtoattach[-1])
+        print(self.FileList)
+        print(self.referencegd)
+        print(self.referencefraction)
+
+        targetmaxdose=max(self.targetdoselist)
+        factorref=1/((float(targetmaxdose)/float(self.referencefraction))/float(self.referenceplanneddose))
+        factorcompare=1/((float(targetmaxdose)/float(self.fractions))/float(self.PlanDose))
+        targetandoar=self.targetnamelist+self.oarnamelist
+        for targetname in targetandoar:
+            overallvalues=[]
+            tempx=[]
+            tempy=[]
+            xvaluesref = []
+            yvaluesref = []
+            xvaluescom = []
+            yvaluescom = []
+            filename=self.referencegd+'.dvh.gd'
+            dIrrVolcc = self.getIrrVolByVOI(filename, targetname) / 1000  # mm^3 --> cc
+            if dIrrVolcc < 0.0:
+                print('wrong file or target, please check')
+                break
+            xvaluesref, yvaluesref = self.getDVHValuesFromFileByVOI(filename, targetname)
+            tempx,tempy=self.fun_interpletevalues(xvaluesref,yvaluesref,factorref,130.1,0.1,'Yref')
+            overallvalues.append(tempx)
+            overallvalues.append(tempy)
+            for filesuffix in self.filesuffixtoattach:
+                xvaluescom = []
+                yvaluescom = []
+                tempx=[]
+                tempy=[]
+                filename=self.FileList[0]+filesuffix+'.dvh.gd'
+                xvaluescom, yvaluescom = self.getDVHValuesFromFileByVOI(filename, targetname)
+                print(filename)
+                tempx,tempy=self.fun_interpletevalues(xvaluescom,yvaluescom,factorcompare,130.1,0.1,'Y'+filesuffix)
+                overallvalues.append(tempy)
+            transposed_overallvalues = list(map(list, zip(*overallvalues)))
+            with open(exportpath+targetname+'.txt', 'w') as f:
+                for rows in transposed_overallvalues:
+                    onerow = ' '.join(str(item) for item in rows)
+                    f.write(onerow + '\n')
+
+    def fun_interpletevalues(self,xvalues,yvalues,factorm,lastvalue,stepvalue,ycolumnname):
+        yvaluesnew=[]
+        xvaluesnew = np.arange(0, lastvalue, stepvalue)
+        # 使用线性插值创建函数
+        # data in xvalues multiply by factorm
+        xvalues=np.array(xvalues)
+        xvalues=xvalues*factorm
+        # insert 200 to xvalues to the last
+        xvalues=np.append(xvalues,200)
+        yvalues.append(0)
+        f = interp1d(xvalues, yvalues, kind='linear')
+        # 基于xvaluesnew进行插值
+        yvaluesnew = f(xvaluesnew)
+        yvaluesnew=yvaluesnew.tolist()
+        xvaluesnew=xvaluesnew.tolist()
+        # insert ycolumnname to yvaluesnew[0]
+        xvaluesnew.insert(0,'X1')
+        yvaluesnew.insert(0,ycolumnname)
+        return xvaluesnew,yvaluesnew
+    
     def getExternalV95(self, filename, voiname, voitype, voidose):
         # print voiname
         if voidose != self.PlanDose:
@@ -849,4 +920,4 @@ class class_analysis_gd:
                 whoistheworst.append(1)
         return whoistheworst
 
-
+    
