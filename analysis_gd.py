@@ -549,6 +549,7 @@ class class_analysis_gd:
         targetmaxdose=max(self.targetdoselist)
         factorref=1/((float(targetmaxdose)/float(self.referencefraction))/float(self.referenceplanneddose))
         factorcompare=1/((float(targetmaxdose)/float(self.fractions))/float(self.PlanDose))
+        print(factorcompare)
         targetandoar=self.targetnamelist+self.oarnamelist
         for targetname in targetandoar:
             overallvalues=[]
